@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Covid-19 Signup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+<section class="bg-gradient-to-br from-blue-50 to-blue-200 min-h-screen flex justify-center items-center">
+  <div class="bg-white/90 rounded-3xl flex max-w-4xl p-5 shadow-xl backdrop-blur-sm items-center">
+
+    <!-- Left Signup Form -->
+    <div class="md:w-1/2 px-8">
+      <h2 class="font-bold text-3xl text-blue-800">Covid-19 Survey Signup</h2>
+      <p class="text-sm mt-4 text-blue-700">Create your account to start the Covid-19 health survey.</p>
+
+      <form id="signupForm" class="flex flex-col gap-4 mt-6">
+
+        <input id="signupName" class="p-3 rounded-xl border border-blue-300" type="text" placeholder="Full Name" required>
+        <input id="signupEmail"  class="p-3 rounded-xl border border-blue-300" type="email" placeholder="Email" required>
+
+        <div class="relative">
+          <input id="signupPassword" class="p-3 rounded-xl border border-blue-300 w-full" type="password" placeholder="Password" required>
+        </div>
+
+        <div class="relative">
+          <input  id="signupConfirm" class="p-3 rounded-xl border border-blue-300 w-full" type="password" placeholder="Confirm Password" required>
+        </div>
+
+        <button id="signupBtn" class="bg-blue-800 text-white py-3 rounded-xl hover:scale-105 duration-300 hover:bg-blue-900 font-medium">
+          Create Account
+        </button>
+      </form>
+
+      <div class="mt-6 items-center text-gray-500">
+        <hr class="border-gray-300">
+        <p class="text-center text-sm">OR</p>
+        <hr class="border-gray-300">
+      </div>
+
+      <button id="signupGoogle" class="bg-white border py-3 w-full rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-105 duration-300 hover:bg-blue-100 font-medium">
+        <svg class="mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="25px">
+          <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12
+          c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24
+          c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
+        </svg>
+        Signup with Google
+      </button>
+
+      <div class="mt-4 text-sm flex justify-between items-center">
+        <p>Already have an account?</p>
+        <a href="index.html" class="text-blue-800 font-semibold hover:underline">Login</a>
+      </div>
+    </div>
+
+    <!-- Right Image -->
+    <div class="md:block hidden w-1/2">
+      <img class="rounded-2xl max-h-[1600px]" src="https://media.istockphoto.com/id/1211544068/vector/virus-bacteria-vector-background-cells-disease-outbreak-coronavirus-alert-pattern.jpg?s=612x612&w=is&k=20&c=F9cEVmfE2LOwbU5YDkK77AqXUGXAreUGLCaOHBNMkTw=" alt="covid signup image">
+    </div>
+
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="app.js"></script>
+</body>
+</html>

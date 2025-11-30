@@ -1,0 +1,58 @@
+/* ---- Smooth Fade In ---- */
+.fade-in {
+  animation: fadeIn 1s ease forwards;
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---- Slide Up ---- */
+.slide-up {
+  animation: slideUp 0.8s ease forwards;
+  transform: translateY(30px);
+  opacity: 0;
+}
+
+@keyframes slideUp {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ---- Glow Button Hover ---- */
+.btn-glow:hover {
+  box-shadow: 0 0 15px rgba(0, 45, 116, 0.6);
+}
+
+/* ---- Image Slide Animation ---- */
+.img-slide {
+  animation: imgEnter 1.2s ease forwards;
+  transform: translateX(40px);
+  opacity: 0;
+}
+
+@keyframes imgEnter {
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ---- Floating Card Animation ---- */
+.float-card {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}

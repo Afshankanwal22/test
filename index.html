@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>COVID Login — UI</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom right, #e3f2fd, #bbdefb);
+    }
+  </style>
+</head>
+
+<body>
+
+<section class="min-h-screen flex justify-center items-center px-4">
+
+  <div class="bg-white/90 backdrop-blur-xl rounded-3xl flex max-w-3xl w-full p-6 md:p-10 shadow-xl items-center border border-blue-200">
+
+    <!-- LEFT LOGIN FORM -->
+    <div class="md:w-1/2 px-4 md:px-8">
+      <h2 class="font-bold text-4xl text-blue-800 drop-shadow-sm">Login</h2>
+      <p class="text-sm mt-2 text-blue-700">
+        Welcome back! Login to continue your Covid-19 survey.
+      </p>
+
+      <form id="loginForm" class="flex flex-col gap-4 mt-6">
+
+        <input id="loginEmail"
+          type="email"
+          name="email"
+          placeholder="Email"
+          class="p-3 rounded-xl border border-blue-300 bg-white text-blue-900 placeholder-blue-400 outline-none focus:border-blue-600 shadow-sm">
+
+        <div class="relative">
+          <input id="password"
+            type="password"
+            name="password"
+            placeholder="Password"
+            class="p-3 rounded-xl border border-blue-300 bg-white text-blue-900 placeholder-blue-400 w-full outline-none focus:border-blue-600 shadow-sm">
+
+          <!-- Eye Icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+            fill="#1e3a8a" id="mama"
+            class="bi bi-eye absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer opacity-60 hover:opacity-100"
+            viewBox="0 0 16 16">
+            <path d="M16 8s-3-5.5-8-5.5S0 8 ..."/>
+          </svg>
+        </div>
+
+        <button id="submit"
+          class="bg-blue-800 text-white py-3 rounded-xl font-semibold shadow-md hover:scale-105 duration-300 hover:bg-blue-900">
+          Login
+        </button>
+
+      </form>
+
+      <!-- OR LINE -->
+      <div class="mt-6 text-gray-500">
+        <hr class="border-gray-300">
+        <p class="text-center text-sm my-2">OR</p>
+        <hr class="border-gray-300">
+      </div>
+
+      <!-- GOOGLE BUTTON -->
+      <button id="googleLoginBtn"
+        class="bg-white border py-3 w-full rounded-xl mt-4 flex justify-center items-center text-sm hover:scale-105 duration-300 hover:bg-blue-100 font-medium shadow-sm">
+        <svg class="mr-3" width="23" viewBox="0 0 48 48">
+          <path fill="#FFC107" d="..."></path>
+        </svg>
+        Login with Google
+      </button>
+
+      <div class="mt-6 text-sm text-blue-800 cursor-pointer hover:underline">Forget password?</div>
+
+      <div class="mt-4 text-sm flex justify-between items-center text-blue-800">
+        <p>If you don't have an account…</p>
+
+        <a href="signup.html">
+          <button
+            class="bg-blue-800 text-white rounded-xl py-2 px-5 hover:scale-110 duration-300 shadow-md font-semibold">
+            Register
+          </button>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- RIGHT IMAGE -->
+    <div class="md:block hidden w-1/2">
+      <img class="rounded-3xl shadow-lg"
+        src="https://media.istockphoto.com/id/1211544068/vector/virus-bacteria-vector-background-cells-disease-outbreak-coronavirus-alert-pattern.jpg?s=612x612&w=is&k=20&c=F9cEVmfE2LOwbU5YDkK77AqXUGXAreUGLCaOHBNMkTw="
+        alt="covid login image">
+    </div>
+
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
