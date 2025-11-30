@@ -150,275 +150,384 @@ signupForm?.addEventListener("submit", async (e) => {
     }
 });
 
-// DOM
+// // DOM
 
-const questionsBox = document.getElementById("questionsBox");
-const submitBtn = document.getElementById("submitBtn");
+// const questionsBox = document.getElementById("questionsBox");
+// const submitBtn = document.getElementById("submitBtn");
 
-// ====== Fetch and Render Questions ======
-async function loadQuestions() {
-  const { data, error } = await client.from('admin').select('*');
+// // ====== Fetch and Render Questions ======
+// async function loadQuestions() {
+//   const { data, error } = await client.from('admin').select('*');
 
-  if(error){
-    Swal.fire({ icon: "error", text: error.message });
-    return;
-  }
+//   if(error){
+//     Swal.fire({ icon: "error", text: error.message });
+//     return;
+//   }
 
-  data.forEach((q, index) => {
-    let html = `<div class="bg-white shadow-lg rounded-xl p-6 mb-4">
-                  <p class="font-semibold mb-2">${index+1}. ${q.qText}</p>`;
+//   data.forEach((q, index) => {
+//     let html = `<div class="bg-white shadow-lg rounded-xl p-6 mb-4">
+//                   <p class="font-semibold mb-2">${index+1}. ${q.qText}</p>`;
 
-    if(q.qType === "multiple") {
-      html += ['A','B','C','D'].map(opt => `
-        <label class="flex items-center p-2 border rounded-lg cursor-pointer mb-1 hover:bg-blue-50">
-          <input type="radio" name="q${index}" value="${opt}" class="form-radio h-5 w-5 text-blue-600 mr-2">
-          ${q[opt]}
-        </label>
-      `).join('');
-    } else if(q.qType === "tf") {
-      html += ['True','False'].map(opt => `
-        <label class="flex items-center p-2 border rounded-lg cursor-pointer mb-1 hover:bg-blue-50">
-          <input type="radio" name="q${index}" value="${opt}" class="form-radio h-5 w-5 text-blue-600 mr-2">
-          ${opt}
-        </label>
-      `).join('');
-    } else if(q.qType === "data") {
-      html += `<p class="text-gray-500 italic">*This is an informational question.</p>`;
-    }
+//     if(q.qType === "multiple") {
+//       html += ['A','B','C','D'].map(opt => `
+//         <label class="flex items-center p-2 border rounded-lg cursor-pointer mb-1 hover:bg-blue-50">
+//           <input type="radio" name="q${index}" value="${opt}" class="form-radio h-5 w-5 text-blue-600 mr-2">
+//           ${q[opt]}
+//         </label>
+//       `).join('');
+//     } else if(q.qType === "tf") {
+//       html += ['True','False'].map(opt => `
+//         <label class="flex items-center p-2 border rounded-lg cursor-pointer mb-1 hover:bg-blue-50">
+//           <input type="radio" name="q${index}" value="${opt}" class="form-radio h-5 w-5 text-blue-600 mr-2">
+//           ${opt}
+//         </label>
+//       `).join('');
+//     } else if(q.qType === "data") {
+//       html += `<p class="text-gray-500 italic">*This is an informational question.</p>`;
+//     }
 
-    html += `<textarea placeholder="Add your comment (optional)" class="w-full p-2 border rounded mt-2" id="comment${index}"></textarea>`;
-    html += `</div>`;
+//     html += `<textarea placeholder="Add your comment (optional)" class="w-full p-2 border rounded mt-2" id="comment${index}"></textarea>`;
+//     html += `</div>`;
 
-    questionsBox && (questionsBox.innerHTML += html);
-  });
-}
+//     questionsBox && (questionsBox.innerHTML += html);
+//   });
+// }
 
-// ====== Submit Answers ======
-submitBtn&& submitBtn.addEventListener("click", () => {
-  let score = 0;
+// // ====== Submit Answers ======
+// submitBtn&& submitBtn.addEventListener("click", () => {
+//   let score = 0;
 
-  questionsBox.querySelectorAll('div').forEach((qDiv, index) => {
-    const qType = ['multiple', 'tf', 'data'][0]; 
-    const questionData = questionsBox.dataset; 
-    const selected = qDiv.querySelector(`input[name="q${index}"]:checked`);
-    const comment = qDiv.querySelector(`#comment${index}`).value;
+//   questionsBox.querySelectorAll('div').forEach((qDiv, index) => {
+//     const qType = ['multiple', 'tf', 'data'][0]; 
+//     const questionData = questionsBox.dataset; 
+//     const selected = qDiv.querySelector(`input[name="q${index}"]:checked`);
+//     const comment = qDiv.querySelector(`#comment${index}`).value;
 
-    if(selected){
-      const answer = selected.value;
-      const correct = questions[index].correct;
+//     if(selected){
+//       const answer = selected.value;
+//       const correct = questions[index].correct;
 
-      if(answer === correct){
-        score++;
-        Swal.fire({ icon:'success', text:`Q${index+1}: Correct!` });
-      } else {
-        Swal.fire({ icon:'error', text:`Q${index+1}: Wrong! ${questions[index].failMessage || ''}` });
-      }
-    }
-  });
-});
+//       if(answer === correct){
+//         score++;
+//         Swal.fire({ icon:'success', text:`Q${index+1}: Correct!` });
+//       } else {
+//         Swal.fire({ icon:'error', text:`Q${index+1}: Wrong! ${questions[index].failMessage || ''}` });
+//       }
+//     }
+//   });
+// });
 
-// ====== Initialize ======
-let questions = [];
-document.addEventListener('DOMContentLoaded', async () => {
-  const { data, error } = await client.from('admin').select('*');
-  if(error) return Swal.fire({ icon:'error', text:error.message });
-  questions = data;
-  loadQuestions();
-});
+// // ====== Initialize ======
+// let questions = [];
+// document.addEventListener('DOMContentLoaded', async () => {
+//   const { data, error } = await client.from('admin').select('*');
+//   if(error) return Swal.fire({ icon:'error', text:error.message });
+//   questions = data;
+//   loadQuestions();
+// });
 
 
 // ADMIN REPORT
 const adminReport=document.getElementById("tabAdminReport")
-adminReport&&adminReport.addEventListener("click", async () => {
+adminReport && adminReport.addEventListener("click", async () => {
     window.location.href = "admin.html";
 // Load Admin Report Automatically
     loadAdminReport();
+})
 
-    async function loadAdminReport() {
-      const box = document.getElementById("adminReport");
-      box.innerHTML = "Loading...";
+   // ====== Fetch and Render Admin Report ======
+// ====== Load Admin Responses as Responsive Cards ======
+async function loadAdminReport() {
+    const box = document.getElementById("adminReport");
 
-      const { data, error } = await client
+    // Wrap in responsive grid
+    box.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="cardsGrid"></div>`;
+    const grid = document.getElementById("cardsGrid");
+
+    // Fetch all responses
+    const { data, error } = await client
         .from("response")
         .select(`
-          id,
-          user_email,
-          user_id,
-          answer,
-          comment,
-          is_correct,
-          created_at,
-          question:question_id (id, qText)
+            id,
+            user_email,
+            user_id,
+            answer,
+            comment,
+            is_correct,
+            created_at,
+            question:question_id (qText)
         `)
         .order("created_at", { ascending: false });
 
-      if (error) {
-        box.innerHTML = "Error loading data.";
+    if (error) {
+        grid.innerHTML = `<p class="text-red-500 col-span-full text-center">Error: ${error.message}</p>`;
         return;
-      }
-
-      box.innerHTML = "";
-
-      data.forEach(r => {
-        box.innerHTML += `
-          <div class="p-4 border rounded bg-gray-50">
-            <p><b>User Email:</b> ${r.user_email}</p>
-            <p><b>Question:</b> ${r.question?.qText || "N/A"}</p>
-            <p><b>Answer:</b> ${r.answer}</p>
-            <p><b>Correct:</b> ${r.is_correct}</p>
-            <p><b>Comment:</b> ${r.comment || "-"}</p>
-            <p class="text-xs text-gray-400">Time: ${new Date(r.created_at).toLocaleString()}</p>
-          </div>
-        `;
-      });
-    }
-  });
-
-// user REPORT
-  const userReport=document.getElementById("tabUserReport")
-  userReport&&userReport.addEventListener("click", async () => {
-    // Redirect to user.html
-    window.location.href = "userR.html";
-async function getUserReport() {
-    const { data: userData } = await client.auth.getUser();
-    if(!userData.user){
-      alert("Please login first!");
-      window.location.href = "index.html";
-      return;
     }
 
-    const email = userData.user.email;
-    const box = document.getElementById("userReport");
-    box.innerHTML = "<p class='text-gray-500 text-center'>Loading...</p>";
-
-    const { data, error } = await client
-      .from("response")
-      .select(`
-        answer,
-        comment,
-        is_correct,
-        created_at,
-        question:question_id (qText)
-      `)
-      .eq('user_email', email)
-      .order('created_at', { ascending: false });
-
-    renderUserData(data, box, error);
-
-    // Realtime subscription
-    client
-      .from(`response:user_email=eq.${email}`)
-      .on('INSERT', payload => {
-          data.unshift(payload.new);
-          renderUserData(data, box);
-      })
-      .subscribe();
-  }
-
-  function renderUserData(data, box, error=null){
-      if(error){
-        box.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+    if (!data || data.length === 0) {
+        grid.innerHTML = "<p class='text-gray-500 col-span-full text-center'>No responses found.</p>";
         return;
-      }
+    }
 
-      if(data.length === 0){
-        box.innerHTML = "<p class='text-gray-500 text-center'>You have not submitted any responses yet.</p>";
-        return;
-      }
+    // Render each response as a card
+    data.forEach((r) => {
+        const card = document.createElement("div");
+        card.className = "bg-white border border-gray-200 rounded-xl shadow-md p-6 hover:shadow-lg transition duration-300";
 
-      box.innerHTML = "";
-      data.forEach((r, i) => {
-        const div = document.createElement("div");
-        div.className = "bg-white p-4 rounded-lg shadow hover:shadow-md transition mb-3";
-        div.innerHTML = `
-          <p class="font-semibold mb-2">Q${i+1}: ${r.question?.qText || "N/A"}</p>
-          <p><b>Answer:</b> ${r.answer}</p>
-          <p><b>Correct:</b> ${r.is_correct}</p>
-          <p><b>Comment:</b> ${r.comment || "-"}</p>
-          <p class="text-xs text-gray-400 mt-1">Submitted: ${new Date(r.created_at).toLocaleString()}</p>
+        card.innerHTML = `
+            <div id="response-${r.id}" class="space-y-2">
+                <p id="userEmail-${r.id}" class="font-semibold text-purple-700 text-sm truncate">📩 ${r.user_email}</p>
+                <p id="question-${r.id}" class="text-gray-800 font-medium"><b>Question:</b> ${r.question?.qText || "N/A"}</p>
+                <p id="answer-${r.id}" class="text-gray-700"><b>Answer:</b> ${r.answer}</p>
+                <p id="correct-${r.id}" class="">
+                    <b>Status:</b> 
+                    <span class="${r.is_correct ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}">
+                        ${r.is_correct ? "✔ Correct" : "✘ Incorrect"}
+                    </span>
+                </p>
+                <p id="comment-${r.id}" class="text-gray-600"><b>Comment:</b> ${r.comment || "No comments"}</p>
+                <p id="submitted-${r.id}" class="text-xs text-gray-400 mt-1">Submitted: ${new Date(r.created_at).toLocaleString()}</p>
+            </div>
         `;
-        box.appendChild(div);
-      });
-  }
 
-  document.addEventListener('DOMContentLoaded', getUserReport);
-});
+        grid.appendChild(card);
+    });
+}
+
+// Auto load on page open
+document.addEventListener("DOMContentLoaded", loadAdminReport);
+
+// // ====== Submit Quiz Answers ======
+// const submitBtns= document.getElementById("submitBtns");
+// const resultBox = document.getElementById("resultBox");
+
+// submitBtns&&submitBtns.addEventListener("click", async () => {
+//   let correctCount = 0;
+//   let wrongCount = 0;
+
+//   // Get current user
+//   const { data: userData } = await client.auth.getUser();
+//   if(!userData.user){
+//     Swal.fire("Please login first!", "", "error");
+//     return;
+//   }
+//   const email = userData.user.email;
+//   const user_id = userData.user.id;
+
+//   let responses = [];
+
+// questions.forEach((q, index) => {
+//   const selected = document.querySelector(`input[name="q${index}"]:checked`);
+//   const answer = selected ? selected.value : null;
+//   const is_correct = answer === q.correct;
+
+//   responses.push({
+//     user_email: email,
+//     user_id: user_id,
+//     question_id: q.id,
+//     answer,
+//     is_correct,
+//     comment: null
+//   });
+// });
 
 
-const submitBtns= document.getElementById("submitBtns");
+//   // Save responses to Supabase
+//   const { data, error } = await client.from("response").insert(responses);
+
+//   if(error){
+//     Swal.fire("Error saving responses", error.message, "error");
+//     return;
+//   }
+
+//   // ====== Ensure user exists in "user" table ======
+// const { data: userExists, error: userError } = await client
+//   .from("user")
+//   .select("*")
+//   .eq("email", email)
+//   .single();
+
+// if (!userExists) {
+//   const { data: newUser, error: insertUserError } = await client
+//     .from("user")
+//     .insert([
+//       {
+//         name: userData.user.user_metadata?.full_name || "N/A",
+//         email: email
+//       }
+//     ]);
+
+//   if (insertUserError) {
+//     Swal.fire("Error saving user info", insertUserError.message, "error");
+//     return;
+//   }
+// }
+
+//   // Hide quiz, show result
+//   document.getElementById("surveyBox").classList.add("hidden");
+//   resultBox.classList.remove("hidden");
+//   resultBox.innerHTML = `
+//     <h2 class="text-xl font-bold mb-3">Quiz Result</h2>
+//     <p>Total Questions: ${questions.length}</p>
+//     <p c
+// lass="text-green-700 font-semibold">Correct Answers: ${correctCount}</p>
+//     <p class="text-red-700 font-semibold">Wrong Answers: ${wrongCount}</p>
+//   `;
+// });
+// ====== DOM Elements ======
+const questionsBox = document.getElementById("questionsBox");
+const submitBtns = document.getElementById("submitBtns");
 const resultBox = document.getElementById("resultBox");
 
-submitBtns&&submitBtns.addEventListener("click", async () => {
-  let correctCount = 0;
-  let wrongCount = 0;
+// ====== Global Variables ======
+let questions = [];
+let currentIndex = 0;
+let userResponses = [];
 
-  // Get current user
-  const { data: userData } = await client.auth.getUser();
-  if(!userData.user){
-    Swal.fire("Please login first!", "", "error");
-    return;
-  }
-  const email = userData.user.email;
-  const user_id = userData.user.id;
-
-  let responses = [];
-
-questions.forEach((q, index) => {
-  const selected = document.querySelector(`input[name="q${index}"]:checked`);
-  const answer = selected ? selected.value : null;
-  const is_correct = answer === q.correct;
-
-  responses.push({
-    user_email: email,
-    user_id: user_id,
-    question_id: q.id,
-    answer,
-    is_correct,
-    comment: null
-  });
-});
-
-
-  // Save responses to Supabase
-  const { data, error } = await client.from("response").insert(responses);
-
-  if(error){
-    Swal.fire("Error saving responses", error.message, "error");
+// ====== Load Questions ======
+async function loadQuestionsOneByOne() {
+  const { data, error } = await client.from('admin').select('*').order('id', { ascending: true });
+  if (error) {
+    Swal.fire({ icon: "error", text: error.message });
     return;
   }
 
-  // ====== Ensure user exists in "user" table ======
-const { data: userExists, error: userError } = await client
-  .from("user")
-  .select("*")
-  .eq("email", email)
-  .single();
-
-if (!userExists) {
-  const { data: newUser, error: insertUserError } = await client
-    .from("user")
-    .insert([
-      {
-        name: userData.user.user_metadata?.full_name || "N/A",
-        email: email
-      }
-    ]);
-
-  if (insertUserError) {
-    Swal.fire("Error saving user info", insertUserError.message, "error");
+  if (!data || data.length === 0) {
+    questionsBox.innerHTML = `<p class="text-gray-500 text-center">No questions available.</p>`;
+    submitBtns.classList.add("hidden");
     return;
+  }
+
+  questions = data;
+  currentIndex = 0;
+  showQuestion(currentIndex);
+}
+
+// ====== Show Single Question ======
+function showQuestion(index) {
+  const q = questions[index];
+  if (!q) return;
+
+  // Clear box
+  questionsBox.innerHTML = "";
+
+  let html = `
+<div class="bg-white p-6 rounded-2xl shadow-lg space-y-4 border border-red-200 transition hover:shadow-2xl">
+
+  <!-- Progress / Question Number -->
+  <div class="flex justify-between items-center mb-3">
+    <span class="text-sm text-red-600 font-semibold">Question ${index+1} of ${questions.length}</span>
+    <div class="w-1/2 h-2 bg-red-100 rounded-full overflow-hidden">
+      <div class="h-full bg-red-600 rounded-full" style="width: ${(index+1)/questions.length*100}%"></div>
+    </div>
+  </div>
+  
+  <!-- Question Text -->
+  <p class="text-gray-800 text-lg font-semibold leading-relaxed">${q.qText}</p>
+  
+  <!-- Options -->
+  <div id="optionsBox" class="space-y-2">
+`;
+
+if (q.qType === "multiple") {
+  html += ['A', 'B', 'C', 'D'].map(opt => `
+    <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-red-50 transition duration-200">
+      <input type="radio" name="q${q.id}" value="${q[opt]}" class="mr-3 h-5 w-5 accent-red-600">
+      <span class="text-gray-700 font-medium">${q[opt]}</span>
+    </label>
+  `).join('');
+} else if (q.qType === "tf") {
+  html += ['True', 'False'].map(opt => `
+    <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-red-50 transition duration-200">
+      <input type="radio" name="q${q.id}" value="${opt}" class="mr-3 h-5 w-5 accent-red-600">
+      <span class="text-gray-700 font-medium">${opt}</span>
+    </label>
+  `).join('');
+} else if (q.qType === "data") {
+  html += `<p class="text-gray-500 italic text-sm">*This is an informational question.</p>`;
+}
+
+html += `
+  </div>
+
+  <!-- Optional Comment -->
+  <textarea placeholder="Add a comment (optional)" id="comment-${q.id}" 
+    class="w-full p-3 border border-red-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-400 mt-3 resize-none text-gray-700"
+    rows="3"></textarea>
+</div>`;
+
+  
+
+  questionsBox.innerHTML = html;
+
+  // Update button text
+  if(currentIndex < questions.length - 1){
+    submitBtns.innerText = "Next";
+  } else {
+    submitBtns.innerText = "Submit Quiz";
   }
 }
 
+// ====== Next / Submit Button ======
+submitBtns.addEventListener("click", async () => {
+  const q = questions[currentIndex];
+  const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
+  const comment = document.getElementById(`comment-${q.id}`).value || null;
+  const answer = selected ? selected.value : null;
+  const is_correct = answer === q.correct;
 
+  // Save user's answer
+  userResponses[currentIndex] = {
+    question_id: q.id,
+    answer,
+    is_correct,
+    comment
+  };
 
-  // Hide quiz, show result
-  document.getElementById("surveyBox").classList.add("hidden");
+  // If last question, submit all
+  if (currentIndex === questions.length - 1) {
+    await submitAllResponses();
+  } else {
+    currentIndex++;
+    showQuestion(currentIndex);
+  }
+});
+
+// ====== Submit all responses to Supabase ======
+async function submitAllResponses() {
+  const { data: userData } = await client.auth.getUser();
+  if (!userData.user) return Swal.fire("Please login first!", "", "error");
+
+  const email = userData.user.email;
+  const user_id = userData.user.id;
+
+  const responsesToInsert = userResponses.map(r => ({
+    user_email: email,
+    user_id: user_id,
+    question_id: r.question_id,
+    answer: r.answer,
+    is_correct: r.is_correct,
+    comment: r.comment
+  }));
+
+  const { error } = await client.from("response").insert(responsesToInsert);
+  if (error) return Swal.fire("Error saving responses", error.message, "error");
+
+  // Show result
+  questionsBox.innerHTML = "";
+  submitBtns.classList.add("hidden");
   resultBox.classList.remove("hidden");
+
+  const correctCount = userResponses.filter(r => r.is_correct).length;
+  const wrongCount = userResponses.filter(r => r.is_correct === false).length;
+
   resultBox.innerHTML = `
-    <h2 class="text-xl font-bold mb-3">Quiz Result</h2>
+    <h2 class="text-xl font-bold mb-3">Quiz Completed!</h2>
     <p>Total Questions: ${questions.length}</p>
     <p class="text-green-700 font-semibold">Correct Answers: ${correctCount}</p>
     <p class="text-red-700 font-semibold">Wrong Answers: ${wrongCount}</p>
   `;
-});
+}
+
+// ====== Initialize on Page Load ======
+document.addEventListener("DOMContentLoaded", loadQuestionsOneByOne);

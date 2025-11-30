@@ -5,28 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Survey Form</title>
 <script src="https://cdn.tailwindcss.com"></script>
- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen flex items-center justify-center p-4">
 
-<div class="w-full max-w-lg bg-white rounded-2xl shadow-xl p-6 space-y-5">
-      <div class="flex space-x-4 mb-6">
-        <button id="tabAdminReport" class="px-4 py-2 bg-gray-200 rounded-lg">Admin Panel</button>
-        <button id="tabUserReport" class="px-4 py-2 bg-gray-200 rounded-lg">User Report</button>
+<div class="w-full max-w-2xl bg-white rounded-3xl shadow-2xl p-8 space-y-6">
+    
+    <!-- Admin Panel Button -->
+    <div class="flex justify-end mb-6">
+        <button id="tabAdminReport" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded-xl font-semibold transition">Admin Panel</button>
     </div>
 
-     <!-- Heading -->
+    <!-- Heading -->
     <div class="text-center">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">Admin Survey Builder</h1>
-        <p class="text-gray-500 text-sm">Add Multiple Choice, True/False or Data questions for your COVID Survey.</p>
+        <h1 class="text-3xl font-extrabold text-gray-800 mb-2">Admin Survey Builder</h1>
+        <p class="text-gray-500 text-sm">Create Multiple Choice, True/False, or Data questions for your COVID Survey</p>
     </div>
 
-    <h2 class="text-2xl font-bold text-center text-gray-800 mb-4">Add Survey Question</h2>
+    <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Add Survey Question</h2>
 
     <!-- Question Type Selector -->
     <div>
         <label class="block font-semibold mb-2">Select Question Type:</label>
-        <select id="qType" onchange="showForm()" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <select id="qType" onchange="showForm()" class="w-full p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 hover:border-blue-400 transition">
             <option value="">-- Select Type --</option>
             <option value="multiple">Multiple Choice</option>
             <option value="tf">True / False</option>
@@ -35,13 +36,13 @@
     </div>
 
     <!-- Multiple Choice Form -->
-    <div id="multipleForm" class="hidden bg-gray-50 p-4 rounded-xl shadow space-y-3">
-        <textarea id="mq" placeholder="Enter your question..." class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400"></textarea>
-        <input id="ma" placeholder="Option A" class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400">
-        <input id="mb" placeholder="Option B" class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400">
-        <input id="mc" placeholder="Option C" class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400">
-        <input id="md" placeholder="Option D" class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400">
-        <select id="mcorrect" class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400">
+    <div id="multipleForm" class="hidden bg-gray-50 p-5 rounded-2xl shadow-md space-y-3">
+        <textarea id="mq" placeholder="Enter your question..." class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400"></textarea>
+        <input id="ma" placeholder="Option A" class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400">
+        <input id="mb" placeholder="Option B" class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400">
+        <input id="mc" placeholder="Option C" class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400">
+        <input id="md" placeholder="Option D" class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400">
+        <select id="mcorrect" class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400 hover:border-blue-400 transition">
             <option value="A">Option A</option>
             <option value="B">Option B</option>
             <option value="C">Option C</option>
@@ -50,31 +51,30 @@
     </div>
 
     <!-- True/False Form -->
-    <div id="tfForm" class="hidden bg-gray-50 p-4 rounded-xl shadow space-y-3">
-        <textarea id="tfq" placeholder="Enter your question..." class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400"></textarea>
-        <select id="tfCorrect" class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400">
+    <div id="tfForm" class="hidden bg-gray-50 p-5 rounded-2xl shadow-md space-y-3">
+        <textarea id="tfq" placeholder="Enter your question..." class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400"></textarea>
+        <select id="tfCorrect" class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400 hover:border-blue-400 transition">
             <option value="True">True</option>
             <option value="False">False</option>
         </select>
     </div>
 
     <!-- Data Only Form -->
-    <div id="dataForm" class="hidden bg-gray-50 p-4 rounded-xl shadow space-y-2">
-        <textarea id="dq" placeholder="Enter data question..." class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400"></textarea>
+    <div id="dataForm" class="hidden bg-gray-50 p-5 rounded-2xl shadow-md space-y-2">
+        <textarea id="dq" placeholder="Enter data question..." class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400"></textarea>
         <p class="text-gray-500 text-sm italic">*This question is informational only and has no correct answer.</p>
     </div>
 
     <!-- Fail Message -->
     <div>
         <label class="block font-semibold mb-1">Fail Response (optional):</label>
-        <input id="failMessage" placeholder="Enter fail response..." class="w-full p-2 rounded border border-gray-300 focus:ring-2 focus:ring-blue-400">
+        <input id="failMessage" placeholder="Enter fail response..." class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400 hover:border-blue-400 transition">
     </div>
 
     <!-- Save Button -->
-    <button id="saveBtn" class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-lg font-semibold text-white transition">Save Question</button>
+    <button id="saveBtn" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-2xl font-bold text-white text-lg transition shadow-lg hover:shadow-xl">Save Question</button>
 
 </div>
- 
 
 <script>
 function showForm() {
@@ -86,9 +86,7 @@ function showForm() {
     if(type === "multiple") document.getElementById("multipleForm").classList.remove("hidden");
     if(type === "tf") document.getElementById("tfForm").classList.remove("hidden");
     if(type === "data") document.getElementById("dataForm").classList.remove("hidden");
-
 }
-
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
@@ -96,3 +94,4 @@ function showForm() {
 
 </body>
 </html>
+
