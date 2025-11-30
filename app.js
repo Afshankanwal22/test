@@ -52,7 +52,7 @@ signupForm?.addEventListener("submit", async (e) => {
     showThemeAlert(error.message, "error");
   } else {
     showThemeAlert(`Signup successful! Welcome, ${name}`, "success");
-    setTimeout(() => { window.location.href = "index.html"; }, 1500);
+    setTimeout(() => { window.location.href = "login.html"; }, 1500);
   }
 });
 
