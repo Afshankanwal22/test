@@ -4,30 +4,64 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Survey Form</title>
+
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
-<body class="bg-gray-100 text-gray-800 min-h-screen flex items-center justify-center p-4">
 
-<div class="w-full max-w-2xl bg-white rounded-3xl shadow-2xl p-8 space-y-6">
-    
+<style>
+  body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #d0e7ff, #b0d4ff, #e3f2fd);
+      overflow-x: hidden;
+  }
+
+  /* Floating Virus Animation */
+  .virus {
+      position: absolute;
+      width: 90px;
+      opacity: 0.13;
+      animation: float 12s infinite ease-in-out;
+      z-index: -1;
+  }
+
+  @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-40px); }
+      100% { transform: translateY(0px); }
+  }
+</style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-6 relative">
+
+<!-- ANIMATED VIRUS ICONS -->
+<img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png" class="virus" style="top: 5%; left: 10%;">
+<img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png" class="virus" style="top: 70%; left: 80%; width: 70px; animation-delay: 2s;">
+<img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png" class="virus" style="top: 40%; left: -5%; width: 110px; animation-delay: 4s;">
+<img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png" class="virus" style="top: 80%; left: 30%; width: 60px; animation-delay: 1s;">
+
+<div class="w-full max-w-3xl bg-white/60 backdrop-blur-2xl rounded-3xl shadow-2xl p-10 border border-blue-300/40">
+
     <!-- Admin Panel Button -->
     <div class="flex justify-end mb-6">
-        <button id="tabAdminReport" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded-xl font-semibold transition">Admin Panel</button>
+        <button id="tabAdminReport" class="px-5 py-2 bg-blue-100 hover:bg-blue-200 rounded-xl font-semibold text-blue-800 transition shadow">
+            Admin Panel
+        </button>
     </div>
 
     <!-- Heading -->
-    <div class="text-center">
-        <h1 class="text-3xl font-extrabold text-gray-800 mb-2">Admin Survey Builder</h1>
-        <p class="text-gray-500 text-sm">Create Multiple Choice, True/False, or Data questions for your COVID Survey</p>
+    <div class="text-center mb-2">
+        <h1 class="text-3xl font-extrabold text-blue-900 drop-shadow-md">Admin Survey Builder</h1>
+        <p class="text-blue-600 text-sm">Create and Manage COVID-19 Survey Questions</p>
     </div>
 
-    <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Add Survey Question</h2>
+    <h2 class="text-xl font-bold text-blue-900 mt-8 mb-4 text-center">Add Survey Question</h2>
 
     <!-- Question Type Selector -->
     <div>
-        <label class="block font-semibold mb-2">Select Question Type:</label>
-        <select id="qType" onchange="showForm()" class="w-full p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 hover:border-blue-400 transition">
+        <label class="block font-semibold mb-2 text-blue-900">Select Question Type:</label>
+        <select id="qType" onchange="showForm()"
+            class="w-full p-3 rounded-xl border border-blue-300 bg-white/80 focus:ring-2 focus:ring-blue-500 transition">
             <option value="">-- Select Type --</option>
             <option value="multiple">Multiple Choice</option>
             <option value="tf">True / False</option>
@@ -36,13 +70,15 @@
     </div>
 
     <!-- Multiple Choice Form -->
-    <div id="multipleForm" class="hidden bg-gray-50 p-5 rounded-2xl shadow-md space-y-3">
-        <textarea id="mq" placeholder="Enter your question..." class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400"></textarea>
-        <input id="ma" placeholder="Option A" class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400">
-        <input id="mb" placeholder="Option B" class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400">
-        <input id="mc" placeholder="Option C" class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400">
-        <input id="md" placeholder="Option D" class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400">
-        <select id="mcorrect" class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400 hover:border-blue-400 transition">
+    <div id="multipleForm" class="hidden bg-blue-50/60 p-5 rounded-2xl shadow-inner border border-blue-200 space-y-3 mt-4">
+        <textarea id="mq" placeholder="Enter your question..."
+            class="w-full p-3 rounded-xl border border-blue-300 focus:ring-2 focus:ring-blue-400"></textarea>
+        <input id="ma" placeholder="Option A" class="w-full p-3 rounded-xl border border-blue-300">
+        <input id="mb" placeholder="Option B" class="w-full p-3 rounded-xl border border-blue-300">
+        <input id="mc" placeholder="Option C" class="w-full p-3 rounded-xl border border-blue-300">
+        <input id="md" placeholder="Option D" class="w-full p-3 rounded-xl border border-blue-300">
+
+        <select id="mcorrect" class="w-full p-3 rounded-xl border border-blue-300 bg-white focus:ring-2">
             <option value="A">Option A</option>
             <option value="B">Option B</option>
             <option value="C">Option C</option>
@@ -51,28 +87,35 @@
     </div>
 
     <!-- True/False Form -->
-    <div id="tfForm" class="hidden bg-gray-50 p-5 rounded-2xl shadow-md space-y-3">
-        <textarea id="tfq" placeholder="Enter your question..." class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400"></textarea>
-        <select id="tfCorrect" class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400 hover:border-blue-400 transition">
+    <div id="tfForm" class="hidden bg-blue-50/60 p-5 rounded-2xl shadow-inner border border-blue-200 space-y-3 mt-4">
+        <textarea id="tfq" placeholder="Enter your question..."
+            class="w-full p-3 rounded-xl border border-blue-300 focus:ring-2 focus:ring-blue-400"></textarea>
+
+        <select id="tfCorrect" class="w-full p-3 rounded-xl border border-blue-300 bg-white">
             <option value="True">True</option>
             <option value="False">False</option>
         </select>
     </div>
 
     <!-- Data Only Form -->
-    <div id="dataForm" class="hidden bg-gray-50 p-5 rounded-2xl shadow-md space-y-2">
-        <textarea id="dq" placeholder="Enter data question..." class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400"></textarea>
-        <p class="text-gray-500 text-sm italic">*This question is informational only and has no correct answer.</p>
+    <div id="dataForm" class="hidden bg-blue-50/60 p-5 rounded-2xl shadow-inner border border-blue-200 space-y-2 mt-4">
+        <textarea id="dq" placeholder="Enter data question..."
+            class="w-full p-3 rounded-xl border border-blue-300"></textarea>
+        <p class="text-blue-600 text-sm italic">*Informational question — no correct answer.</p>
     </div>
 
     <!-- Fail Message -->
-    <div>
-        <label class="block font-semibold mb-1">Fail Response (optional):</label>
-        <input id="failMessage" placeholder="Enter fail response..." class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400 hover:border-blue-400 transition">
+    <div class="mt-6">
+        <label class="block font-semibold mb-1 text-blue-900">Fail Response (optional):</label>
+        <input id="failMessage" placeholder="Enter fail response..."
+            class="w-full p-3 rounded-xl border border-blue-300 bg-white focus:ring-2 focus:ring-blue-400">
     </div>
 
     <!-- Save Button -->
-    <button id="saveBtn" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-2xl font-bold text-white text-lg transition shadow-lg hover:shadow-xl">Save Question</button>
+    <button id="saveBtn"
+        class="w-full mt-6 bg-blue-700 hover:bg-blue-800 py-3 rounded-2xl font-bold text-white text-lg transition shadow-xl hover:scale-105">
+        Save Question
+    </button>
 
 </div>
 
@@ -94,4 +137,3 @@ function showForm() {
 
 </body>
 </html>
-

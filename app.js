@@ -422,8 +422,10 @@ function showQuestion(index) {
     </div>
   </div>
   
-  <!-- Question Text -->
-  <p class="text-gray-800 text-lg font-semibold leading-relaxed">${q.qText}</p>
+  <!-- Question Text with scroll -->
+  <p class="text-gray-800 text-lg font-semibold leading-relaxed max-h-40 overflow-y-auto pr-2">
+    ${q.qText}
+  </p>
   
   <!-- Options -->
   <div id="optionsBox" class="space-y-2">
@@ -455,6 +457,7 @@ html += `
     class="w-full p-3 border border-red-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-400 mt-3 resize-none text-gray-700"
     rows="3"></textarea>
 </div>`;
+
 
   
 
@@ -522,11 +525,36 @@ async function submitAllResponses() {
   const wrongCount = userResponses.filter(r => r.is_correct === false).length;
 
   resultBox.innerHTML = `
-    <h2 class="text-xl font-bold mb-3">Quiz Completed!</h2>
-    <p>Total Questions: ${questions.length}</p>
-    <p class="text-green-700 font-semibold">Correct Answers: ${correctCount}</p>
-    <p class="text-red-700 font-semibold">Wrong Answers: ${wrongCount}</p>
-  `;
+  <div class="bg-white/80 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-red-200 max-w-xl mx-auto text-center space-y-4">
+    
+    <h2 class="text-3xl font-extrabold text-gray-800 drop-shadow-sm">Quiz Completed!</h2>
+    
+    <div class="flex justify-between text-lg font-medium mt-4">
+      <span>Total Questions:</span>
+      <span class="text-gray-700">${questions.length}</span>
+    </div>
+
+    <div class="flex justify-between text-lg font-medium text-green-700">
+      <span>Correct Answers:</span>
+      <span>${correctCount}</span>
+    </div>
+
+    <div class="flex justify-between text-lg font-medium text-red-700">
+      <span>Wrong Answers:</span>
+      <span>${wrongCount}</span>
+    </div>
+
+    <a href="user.html">
+  <button class="mt-6 bg-blue-600 text-white py-3 px-6 rounded-full font-semibold shadow-lg 
+                 hover:bg-blue-700 hover:shadow-xl transition-all duration-300">
+    Retry Quiz
+  </button>
+</a>
+
+
+  </div>
+`;
+
 }
 
 // ====== Initialize on Page Load ======
