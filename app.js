@@ -361,23 +361,21 @@ submitBtns&&submitBtns.addEventListener("click", async () => {
 
   let responses = [];
 
-  questions.forEach((q, index) => {
-    const selected = document.querySelector(`input[name="q${index}"]:checked`);
-    const answer = selected ? selected.value : null;
-    const is_correct = answer === q.correct;
+questions.forEach((q, index) => {
+  const selected = document.querySelector(`input[name="q${index}"]:checked`);
+  const answer = selected ? selected.value : null;
+  const is_correct = answer === q.correct;
 
-    if(is_correct) correctCount++;
-    else wrongCount++;
-
-    responses.push({
-      user_email: email,
-      user_id: user_id,
-      question_id: q.id,
-      answer,
-      is_correct,
-      comment: null
-    });
+  responses.push({
+    user_email: email,
+    user_id: user_id,
+    question_id: q.id,
+    answer,
+    is_correct,
+    comment: null
   });
+});
+
 
   // Save responses to Supabase
   const { data, error } = await client.from("response").insert(responses);
@@ -386,6 +384,31 @@ submitBtns&&submitBtns.addEventListener("click", async () => {
     Swal.fire("Error saving responses", error.message, "error");
     return;
   }
+
+  // ====== Ensure user exists in "user" table ======
+const { data: userExists, error: userError } = await client
+  .from("user")
+  .select("*")
+  .eq("email", email)
+  .single();
+
+if (!userExists) {
+  const { data: newUser, error: insertUserError } = await client
+    .from("user")
+    .insert([
+      {
+        name: userData.user.user_metadata?.full_name || "N/A",
+        email: email
+      }
+    ]);
+
+  if (insertUserError) {
+    Swal.fire("Error saving user info", insertUserError.message, "error");
+    return;
+  }
+}
+
+
 
   // Hide quiz, show result
   document.getElementById("surveyBox").classList.add("hidden");
