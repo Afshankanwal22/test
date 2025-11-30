@@ -25,6 +25,8 @@ function showThemeAlert(message, type = "success") {
   }, 2000);
 }
 
+
+
 // ====== Signup Form ======
 const signupForm = document.querySelector("#signupForm");
 signupForm?.addEventListener("submit", async (e) => {
