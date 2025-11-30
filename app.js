@@ -154,8 +154,7 @@ signupForm?.addEventListener("submit", async (e) => {
 });
 
 // DOM
-// const questionsBox = document.getElementById("questionsBox");
-// ====== DOM Elements ======
+
 const questionsBox = document.getElementById("questionsBox");
 const submitBtn = document.getElementById("submitBtn");
 
@@ -193,7 +192,7 @@ async function loadQuestions() {
     html += `<textarea placeholder="Add your comment (optional)" class="w-full p-2 border rounded mt-2" id="comment${index}"></textarea>`;
     html += `</div>`;
 
-    questionsBox.innerHTML += html;
+    questionsBox && (questionsBox.innerHTML += html);
   });
 }
 
@@ -202,8 +201,8 @@ submitBtn&& submitBtn.addEventListener("click", () => {
   let score = 0;
 
   questionsBox.querySelectorAll('div').forEach((qDiv, index) => {
-    const qType = ['multiple', 'tf', 'data'][0]; // Placeholder if you need type check
-    const questionData = questionsBox.dataset; // or fetch from Supabase data again
+    const qType = ['multiple', 'tf', 'data'][0]; 
+    const questionData = questionsBox.dataset; 
     const selected = qDiv.querySelector(`input[name="q${index}"]:checked`);
     const comment = qDiv.querySelector(`#comment${index}`).value;
 
@@ -228,4 +227,178 @@ document.addEventListener('DOMContentLoaded', async () => {
   if(error) return Swal.fire({ icon:'error', text:error.message });
   questions = data;
   loadQuestions();
+});
+
+
+// ADMIN REPORT
+const adminReport=document.getElementById("tabAdminReport")
+adminReport&&adminReport.addEventListener("click", async () => {
+    window.location.href = "admin.html";
+// Load Admin Report Automatically
+    loadAdminReport();
+
+    async function loadAdminReport() {
+      const box = document.getElementById("adminReport");
+      box.innerHTML = "Loading...";
+
+      const { data, error } = await client
+        .from("response")
+        .select(`
+          id,
+          user_email,
+          user_id,
+          answer,
+          comment,
+          is_correct,
+          created_at,
+          question:question_id (id, qText)
+        `)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        box.innerHTML = "Error loading data.";
+        return;
+      }
+
+      box.innerHTML = "";
+
+      data.forEach(r => {
+        box.innerHTML += `
+          <div class="p-4 border rounded bg-gray-50">
+            <p><b>User Email:</b> ${r.user_email}</p>
+            <p><b>Question:</b> ${r.question?.qText || "N/A"}</p>
+            <p><b>Answer:</b> ${r.answer}</p>
+            <p><b>Correct:</b> ${r.is_correct}</p>
+            <p><b>Comment:</b> ${r.comment || "-"}</p>
+            <p class="text-xs text-gray-400">Time: ${new Date(r.created_at).toLocaleString()}</p>
+          </div>
+        `;
+      });
+    }
+  });
+
+// user REPORT
+  const userReport=document.getElementById("tabUserReport")
+  userReport&&userReport.addEventListener("click", async () => {
+    // Redirect to user.html
+    window.location.href = "userR.html";
+async function getUserReport() {
+    const { data: userData } = await client.auth.getUser();
+    if(!userData.user){
+      alert("Please login first!");
+      window.location.href = "index.html";
+      return;
+    }
+
+    const email = userData.user.email;
+    const box = document.getElementById("userReport");
+    box.innerHTML = "<p class='text-gray-500 text-center'>Loading...</p>";
+
+    const { data, error } = await client
+      .from("response")
+      .select(`
+        answer,
+        comment,
+        is_correct,
+        created_at,
+        question:question_id (qText)
+      `)
+      .eq('user_email', email)
+      .order('created_at', { ascending: false });
+
+    renderUserData(data, box, error);
+
+    // Realtime subscription
+    client
+      .from(`response:user_email=eq.${email}`)
+      .on('INSERT', payload => {
+          data.unshift(payload.new);
+          renderUserData(data, box);
+      })
+      .subscribe();
+  }
+
+  function renderUserData(data, box, error=null){
+      if(error){
+        box.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+        return;
+      }
+
+      if(data.length === 0){
+        box.innerHTML = "<p class='text-gray-500 text-center'>You have not submitted any responses yet.</p>";
+        return;
+      }
+
+      box.innerHTML = "";
+      data.forEach((r, i) => {
+        const div = document.createElement("div");
+        div.className = "bg-white p-4 rounded-lg shadow hover:shadow-md transition mb-3";
+        div.innerHTML = `
+          <p class="font-semibold mb-2">Q${i+1}: ${r.question?.qText || "N/A"}</p>
+          <p><b>Answer:</b> ${r.answer}</p>
+          <p><b>Correct:</b> ${r.is_correct}</p>
+          <p><b>Comment:</b> ${r.comment || "-"}</p>
+          <p class="text-xs text-gray-400 mt-1">Submitted: ${new Date(r.created_at).toLocaleString()}</p>
+        `;
+        box.appendChild(div);
+      });
+  }
+
+  document.addEventListener('DOMContentLoaded', getUserReport);
+});
+
+
+const submitBtns= document.getElementById("submitBtns");
+const resultBox = document.getElementById("resultBox");
+
+submitBtns&&submitBtns.addEventListener("click", async () => {
+  let correctCount = 0;
+  let wrongCount = 0;
+
+  // Get current user
+  const { data: userData } = await client.auth.getUser();
+  if(!userData.user){
+    Swal.fire("Please login first!", "", "error");
+    return;
+  }
+  const email = userData.user.email;
+  const user_id = userData.user.id;
+
+  let responses = [];
+
+  questions.forEach((q, index) => {
+    const selected = document.querySelector(`input[name="q${index}"]:checked`);
+    const answer = selected ? selected.value : null;
+    const is_correct = answer === q.correct;
+
+    if(is_correct) correctCount++;
+    else wrongCount++;
+
+    responses.push({
+      user_email: email,
+      user_id: user_id,
+      question_id: q.id,
+      answer,
+      is_correct,
+      comment: null
+    });
+  });
+
+  // Save responses to Supabase
+  const { data, error } = await client.from("response").insert("*");
+
+  if(error){
+    Swal.fire("Error saving responses", error.message, "error");
+    return;
+  }
+
+  // Hide quiz, show result
+  document.getElementById("surveyBox").classList.add("hidden");
+  resultBox.classList.remove("hidden");
+  resultBox.innerHTML = `
+    <h2 class="text-xl font-bold mb-3">Quiz Result</h2>
+    <p>Total Questions: ${questions.length}</p>
+    <p class="text-green-700 font-semibold">Correct Answers: ${correctCount}</p>
+    <p class="text-red-700 font-semibold">Wrong Answers: ${wrongCount}</p>
+  `;
 });
