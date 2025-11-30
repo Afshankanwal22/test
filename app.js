@@ -57,11 +57,6 @@ signupForm?.addEventListener("submit", async (e) => {
 // Admin emails
   const adminEmails = ["kanwalafshan2244@gmail.com"];
 
-  
-  // function showThemeAlert(msg, type="success") {
-  //   Swal.fire({ icon: type, text: msg, timer: 1500, showConfirmButton: false });
-  // }
-
   // Login form
   const loginForm = document.getElementById("loginForm");
    loginForm && loginForm.addEventListener("submit", async (e) => {
@@ -385,7 +380,7 @@ submitBtns&&submitBtns.addEventListener("click", async () => {
   });
 
   // Save responses to Supabase
-  const { data, error } = await client.from("response").insert("*");
+  const { data, error } = await client.from("response").insert(responses);
 
   if(error){
     Swal.fire("Error saving responses", error.message, "error");
