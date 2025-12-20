@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>View Questions</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<style>
+  body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg,#d0e7ff,#b0d4ff,#e3f2fd); }
+  .table-wrapper { overflow-x:auto; }
+  .modal-bg { position: fixed; inset:0; background: rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:50; }
+  .modal-content { background:white; padding:1.5rem; border-radius:1rem; width:100%; max-width:400px; box-shadow:0 10px 25px rgba(0,0,0,0.3); transform: scale(0.95); opacity:0; transition: all 0.2s ease-in-out; }
+  .modal-content.show { transform: scale(1); opacity:1; }
+</style>
+</head>
+<body class="p-6">
+
+<h1 class="text-3xl font-bold text-blue-900 mb-6 text-center">View Questions</h1>
+
+<div class="table-wrapper bg-white/60 p-6 rounded-2xl shadow-xl border border-blue-300">
+<table class="min-w-full table-auto border-collapse">
+  <thead class="bg-blue-100 text-blue-900 font-semibold">
+    <tr>
+      <th class="border px-4 py-2">#</th>
+      <th class="border px-4 py-2">Question</th>
+      <th class="border px-4 py-2">Type</th>
+      <th class="border px-4 py-2">Correct Answer</th>
+      <th class="border px-4 py-2">Actions</th>
+    </tr>
+  </thead>
+  <tbody id="questionsTable" class="text-gray-700">
+    <!-- Questions will be populated here -->
+  </tbody>
+</table>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal-bg hidden">
+  <div id="editModalContent" class="modal-content">
+    <h2 class="text-xl font-bold text-center mb-4">Edit Question</h2>
+    <textarea id="editQText" class="w-full border border-gray-300 rounded-lg p-2 mb-3" rows="3"></textarea>
+    <input type="text" id="editCorrect" class="w-full border border-gray-300 rounded-lg p-2 mb-3" placeholder="Correct Answer">
+    <div class="flex justify-end gap-3">
+      <button id="cancelEdit" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition">Cancel</button>
+      <button id="updateBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Update</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://jzorrdpsvtvoglvxhjfi.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6b3JyZHBzdnR2b2dsdnhoamZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNDA3MzMsImV4cCI6MjA3NjYxNjczM30.HOrkOrtH03AS-q9W-E0w7woDS2ESPDIVBaS64qzDpZw";
+const { createClient } = supabase;
+const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let editId = null;
+
+// Load questions in table
+async function loadQuestions() {
+  const { data, error } = await client.from("admin").select("*").order("id",{ascending:true});
+  const table = document.getElementById("questionsTable");
+  table.innerHTML = "";
+  if(error) return Swal.fire("Error",error.message,"error");
+  if(!data || data.length===0) return table.innerHTML="<tr><td colspan='5' class='text-center text-gray-500 py-4'>No questions found</td></tr>";
+
+  data.forEach((q,i)=>{
+    const row = document.createElement("tr");
+    row.className="border-b hover:bg-blue-50 transition";
+    row.innerHTML=`
+      <td class="border px-4 py-2">${i+1}</td>
+      <td class="border px-4 py-2">${q.qText}</td>
+      <td class="border px-4 py-2">${q.qType}</td>
+      <td class="border px-4 py-2">${q.correct || "-"}</td>
+      <td class="border px-4 py-2 flex gap-2">
+        <button class="bg-yellow-400 text-white px-3 py-1 rounded hover:bg-yellow-500" data-id="${q.id}" data-qtext="${q.qText}" data-correct="${q.correct || ''}">Edit</button>
+        <button class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700" data-id="${q.id}">Delete</button>
+      </td>
+    `;
+    table.appendChild(row);
+  });
+
+  // Add event listeners for Edit/Delete after table is loaded
+  document.querySelectorAll("button.bg-yellow-400").forEach(btn=>{
+    btn.addEventListener("click",()=>openEdit(btn.dataset.id, btn.dataset.qtext, btn.dataset.correct));
+  });
+  document.querySelectorAll("button.bg-red-600").forEach(btn=>{
+    btn.addEventListener("click",()=>deleteQuestion(btn.dataset.id));
+  });
+}
+
+// Open Edit Modal
+function openEdit(id,qText,correct){
+  editId=id;
+  const modal=document.getElementById("editModal");
+  const modalContent=document.getElementById("editModalContent");
+  document.getElementById("editQText").value=qText;
+  document.getElementById("editCorrect").value=correct;
+
+  modal.classList.remove("hidden");
+  setTimeout(()=>{ modalContent.classList.add("show"); },50);
+}
+
+// Cancel Edit
+document.getElementById("cancelEdit").addEventListener("click",()=>{
+  const modal=document.getElementById("editModal");
+  const modalContent=document.getElementById("editModalContent");
+  modalContent.classList.remove("show");
+  setTimeout(()=>{ modal.classList.add("hidden"); },200);
+});
+
+// Update Question
+document.getElementById("updateBtn").addEventListener("click",async()=>{
+  const qText=document.getElementById("editQText").value;
+  const correct=document.getElementById("editCorrect").value;
+
+  if(!qText) return Swal.fire("Error","Question text cannot be empty","error");
+
+  const { error } = await client.from("admin").update({ qText, correct }).eq("id", editId);
+  if(error) return Swal.fire("Error",error.message,"error");
+
+  Swal.fire("Updated!","Question updated successfully","success");
+  document.getElementById("editModalContent").classList.remove("show");
+  setTimeout(()=>{ document.getElementById("editModal").classList.add("hidden"); loadQuestions(); },200);
+});
+
+// Delete Question
+async function deleteQuestion(id){
+  const result = await Swal.fire({
+    title: 'Are you sure?',
+    text: "You won't be able to revert this!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, delete it!'
+  });
+  if(result.isConfirmed){
+    const { error } = await client.from("admin").delete().eq("id", id);
+    if(error) return Swal.fire("Error",error.message,"error");
+    Swal.fire("Deleted!","Question deleted.","success");
+    loadQuestions();
+  }
+}
+
+// Load on page open
+document.addEventListener("DOMContentLoaded", loadQuestions);
+</script>
+</body>
+</html>

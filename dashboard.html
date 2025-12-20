@@ -34,13 +34,46 @@
 
 <body class="min-h-screen flex items-center justify-center p-6 relative">
 
+
+    <!-- NAVBAR -->
+<nav class="w-full bg-white/60 backdrop-blur-md shadow-md border-b border-blue-200 fixed top-0 left-0 z-50">
+  <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <div class="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center font-bold text-blue-800">H</div>
+      <span class="text-xl font-bold text-blue-900">Survey Admin</span>
+    </div>
+    <ul class="hidden md:flex items-center gap-6 text-blue-800 font-semibold">
+      <li><a href="viewQuestion.html" class="hover:text-blue-900 transition">View Questions</a></li>
+      <li><a href="adminReport.html" class="hover:text-blue-900 transition">Reports</a></li>
+      <li><a href="#settings" class="hover:text-blue-900 transition">Settings</a></li>
+    </ul>
+    <!-- Mobile Menu Button -->
+    <div class="md:hidden">
+      <button id="menuBtn" class="text-blue-800 focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+        </svg>
+      </button>
+    </div>
+  </div>
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" class="hidden md:hidden bg-white/70 backdrop-blur-md border-t border-blue-200">
+    <ul class="flex flex-col gap-3 p-4 text-blue-800 font-semibold">
+      <li><a href="#addQuestion" class="hover:text-blue-900 transition">Add Question</a></li>
+      <li><a href="#viewQuestions" class="hover:text-blue-900 transition">View Questions</a></li>
+      <li><a href="#reports" class="hover:text-blue-900 transition">Reports</a></li>
+      <li><a href="#settings" class="hover:text-blue-900 transition">Settings</a></li>
+    </ul>
+  </div>
+</nav>
+
 <!-- ANIMATED VIRUS ICONS -->
 <img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png" class="virus" style="top: 5%; left: 10%;">
 <img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png" class="virus" style="top: 70%; left: 80%; width: 70px; animation-delay: 2s;">
 <img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png" class="virus" style="top: 40%; left: -5%; width: 110px; animation-delay: 4s;">
 <img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png" class="virus" style="top: 80%; left: 30%; width: 60px; animation-delay: 1s;">
 
-<div class="w-full max-w-3xl bg-white/60 backdrop-blur-2xl rounded-3xl shadow-2xl p-10 border border-blue-300/40">
+<div class="w-full max-w-3xl bg-white/60 backdrop-blur-2xl rounded-3xl shadow-2xl p-10  border border-blue-300/40">
 
     <!-- Admin Panel Button -->
     <div class="flex justify-end mb-6">

@@ -266,20 +266,20 @@ document.addEventListener("DOMContentLoaded", loadAdminReport);
     });
   }
 
-    // ====== Load Questions ======
-    async function loadQuestionsOneByOne() {
-      const { data, error } = await client.from('admin').select('*').order('id', { ascending: true });
-      if (error) return Swal.fire({ icon: "error", text: error.message });
-      if (!data || data.length === 0) {
-        questionsBox.innerHTML = `<p class="text-gray-500 text-center">No questions available.</p>`;
-        submitBtns.classList.add("hidden");
-        return;
-      }
-      questions = data;
-      currentIndex = 0;
-      showQuestion(currentIndex);
-        startTimer();
-    }
+    // // ====== Load Questions ======
+    // async function loadQuestionsOneByOne() {
+    //   const { data, error } = await client.from('admin').select('*').order('id', { ascending: true });
+    //   if (error) return Swal.fire({ icon: "error", text: error.message });
+    //   if (!data || data.length === 0) {
+    //     questionsBox.innerHTML = `<p class="text-gray-500 text-center">No questions available.</p>`;
+    //     submitBtns.classList.add("hidden");
+    //     return;
+    //   }
+    //   questions = data;
+    //   currentIndex = 0;
+    //   showQuestion(currentIndex);
+    //     startTimer();
+    // }
 
     // ====== Show Single Question ======
     function showQuestion(index) {
