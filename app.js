@@ -160,65 +160,65 @@ adminReport && adminReport.addEventListener("click", async () => {
 
    // ====== Fetch and Render Admin Report ======
 // ====== Load Admin Responses as Responsive Cards ======
-async function loadAdminReport() {
-    const box = document.getElementById("adminReport");
+// async function loadAdminReport() {
+//     const box = document.getElementById("adminReport");
 
-    // Wrap in responsive grid
-    box.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="cardsGrid"></div>`;
-    const grid = document.getElementById("cardsGrid");
+//     // Wrap in responsive grid
+//     box.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="cardsGrid"></div>`;
+//     const grid = document.getElementById("cardsGrid");
 
-    // Fetch all responses
-    const { data, error } = await client
-        .from("response")
-        .select(`
-            id,
-            user_email,
-            user_id,
-            answer,
-            comment,
-            is_correct,
-            created_at,
-            question:question_id (qText)
-        `)
-        .order("created_at", { ascending: false });
+//     // Fetch all responses
+//     const { data, error } = await client
+//         .from("response")
+//         .select(`
+//             id,
+//             user_email,
+//             user_id,
+//             answer,
+//             comment,
+//             is_correct,
+//             created_at,
+//             question:question_id (qText)
+//         `)
+//         .order("created_at", { ascending: false });
 
-    if (error) {
-        grid.innerHTML = `<p class="text-red-500 col-span-full text-center">Error: ${error.message}</p>`;
-        return;
-    }
+//     if (error) {
+//         grid.innerHTML = `<p class="text-red-500 col-span-full text-center">Error: ${error.message}</p>`;
+//         return;
+//     }
 
-    if (!data || data.length === 0) {
-        grid.innerHTML = "<p class='text-gray-500 col-span-full text-center'>No responses found.</p>";
-        return;
-    }
+//     if (!data || data.length === 0) {
+//         grid.innerHTML = "<p class='text-gray-500 col-span-full text-center'>No responses found.</p>";
+//         return;
+//     }
 
-    // Render each response as a card
-    data.forEach((r) => {
-        const card = document.createElement("div");
-        card.className = "bg-white border border-gray-200 rounded-xl shadow-md p-6 hover:shadow-lg transition duration-300";
+//     // Render each response as a card
+//     data.forEach((r) => {
+//         const card = document.createElement("div");
+//         card.className = "bg-white border border-gray-200 rounded-xl shadow-md p-6 hover:shadow-lg transition duration-300";
 
-        card.innerHTML = `
-            <div id="response-${r.id}" class="space-y-2">
-                <p id="userEmail-${r.id}" class="font-semibold text-purple-700 text-sm truncate">📩 ${r.user_email}</p>
-                <p id="question-${r.id}" class="text-gray-800 font-medium"><b>Question:</b> ${r.question?.qText || "N/A"}</p>
-                <p id="answer-${r.id}" class="text-gray-700"><b>Answer:</b> ${r.answer}</p>
-                <p id="correct-${r.id}" class="">
-                    <b>Status:</b> 
-                    <span class="${r.is_correct ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}">
-                        ${r.is_correct ? "✔ Correct" : "✘ Incorrect"}
-                    </span>
-                </p>
-                <p id="comment-${r.id}" class="text-gray-600"><b>Comment:</b> ${r.comment || "No comments"}</p>
-                <p id="submitted-${r.id}" class="text-xs text-gray-400 mt-1">Submitted: ${new Date(r.created_at).toLocaleString()}</p>
-            </div>
-        `;
+//         card.innerHTML = `
+//             <div id="response-${r.id}" class="space-y-2">
+//                 <p id="userEmail-${r.id}" class="font-semibold text-purple-700 text-sm truncate">📩 ${r.user_email}</p>
+//                 <p id="question-${r.id}" class="text-gray-800 font-medium"><b>Question:</b> ${r.question?.qText || "N/A"}</p>
+//                 <p id="answer-${r.id}" class="text-gray-700"><b>Answer:</b> ${r.answer}</p>
+//                 <p id="correct-${r.id}" class="">
+//                     <b>Status:</b> 
+//                     <span class="${r.is_correct ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}">
+//                         ${r.is_correct ? "✔ Correct" : "✘ Incorrect"}
+//                     </span>
+//                 </p>
+//                 <p id="comment-${r.id}" class="text-gray-600"><b>Comment:</b> ${r.comment || "No comments"}</p>
+//                 <p id="submitted-${r.id}" class="text-xs text-gray-400 mt-1">Submitted: ${new Date(r.created_at).toLocaleString()}</p>
+//             </div>
+//         `;
 
-        grid.appendChild(card);
-    });
-}
+//         grid.appendChild(card);
+//     });
+// }
 
-// Auto load on page open
-document.addEventListener("DOMContentLoaded", loadAdminReport);
+// // Auto load on page open
+// document.addEventListener("DOMContentLoaded", loadAdminReport);
 
 // USER QUIZ FUNCTIONALITY
 

@@ -4,157 +4,108 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Report</title>
+
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
+
 <body class="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen p-6">
 
-  <div class="max-w-7xl mx-auto">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-extrabold text-blue-900">Admin Report</h1>
-      <input type="text" id="searchEmail" placeholder="Search by email..."
-        class="p-2 rounded-xl border border-blue-300 focus:ring-2 focus:ring-blue-500">
-    </div>
+<div class="max-w-7xl mx-auto">
 
-    <!-- Table -->
-    <div class="overflow-x-auto bg-white rounded-2xl shadow-lg p-4">
-      <table class="min-w-full divide-y divide-gray-200 text-sm text-gray-700" id="responsesTable">
-        <thead class="bg-blue-100 text-blue-900 font-semibold">
-          <tr>
-            <th class="px-4 py-2">#</th>
-            <th class="px-4 py-2">User Email</th>
-            <th class="px-4 py-2">Question</th>
-            <th class="px-4 py-2">Answer</th>
-            <th class="px-4 py-2">Status</th>
-            <th class="px-4 py-2">Comment</th>
-            <th class="px-4 py-2">Submitted At</th>
-            <th class="px-4 py-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="responsesBody" class="divide-y divide-gray-100">
-          <!-- Responses will load here dynamically -->
-        </tbody>
-      </table>
-    </div>
+  <h1 class="text-3xl font-extrabold text-blue-900 mb-6">📊 Admin Report</h1>
+
+  <div class="bg-white rounded-2xl shadow-xl overflow-x-auto">
+    <table class="min-w-full text-sm text-gray-700">
+      <thead class="bg-blue-100 text-blue-900">
+        <tr>
+          <th class="px-4 py-3">#</th>
+          <th class="px-4 py-3">User Email</th>
+          <th class="px-4 py-3">Question</th>
+          <th class="px-4 py-3">Answer</th>
+          <th class="px-4 py-3">Result</th>
+          <th class="px-4 py-3">Comment</th>
+          <th class="px-4 py-3">Date</th>
+        </tr>
+      </thead>
+      <tbody id="reportBody"></tbody>
+    </table>
   </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</div>
+
 <script>
-  const SUPABASE_URL = "https://jzorrdpsvtvoglvxhjfi.supabase.co";
-  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
-  const { createClient } = supabase;
-  const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+/* ===== SUPABASE CONFIG (REAL KEY) ===== */
+const SUPABASE_URL = "https://jzorrdpsvtvoglvxhjfi.supabase.co";
+const SUPABASE_ANON_KEY =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6b3JyZHBzdnR2b2dsdnhoamZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNDA3MzMsImV4cCI6MjA3NjYxNjczM30.HOrkOrtH03AS-q9W-E0w7woDS2ESPDIVBaS64qzDpZw";
 
-  // Fetch and render responses
-  async function loadResponses(filterEmail = "") {
-    const { data, error } = await client
-      .from("response")
-      .select(`
-        id,
-        user_email,
-        question_id (qText, qType, correct),
-        answer,
-        comment,
-        is_correct,
-        created_at
-      `)
-      .order("created_at", { ascending: false });
+const { createClient } = supabase;
+const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    if(error){
-      Swal.fire("Error", error.message, "error");
-      return;
-    }
+/* ===== LOAD REPORT ===== */
+async function loadReport() {
 
-    const tbody = document.getElementById("responsesBody");
-    tbody.innerHTML = "";
+  const { data, error } = await client
+    .from("response")
+    .select(`
+      id,
+      user_email,
+      answer,
+      comment,
+      is_correct,
+      created_at,
+      admin:question_id ( qText )
+    `)
+    .order("created_at", { ascending: false });
 
-    let counter = 1;
-    data.forEach(r => {
-      if(filterEmail && !r.user_email.includes(filterEmail)) return;
+  const tbody = document.getElementById("reportBody");
+  tbody.innerHTML = "";
 
-      const statusClass = r.is_correct ? "text-green-600" : "text-red-600";
-      const statusText = r.is_correct ? "✔ Passed" : "✘ Failed";
-
-      const tr = document.createElement("tr");
-      tr.className = "hover:bg-blue-50 transition";
-
-      tr.innerHTML = `
-        <td class="px-4 py-2 text-center">${counter++}</td>
-        <td class="px-4 py-2">${r.user_email}</td>
-        <td class="px-4 py-2 max-w-xs truncate">${r.question_id?.qText || "N/A"}</td>
-        <td class="px-4 py-2">${r.answer || "-"}</td>
-        <td class="px-4 py-2 font-semibold ${statusClass}">${statusText}</td>
-        <td class="px-4 py-2 max-w-xs truncate">${r.comment || "-"}</td>
-        <td class="px-4 py-2">${new Date(r.created_at).toLocaleString()}</td>
-        <td class="px-4 py-2 space-x-2 text-center">
-          <button class="editBtn px-2 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700" data-id="${r.id}">Edit</button>
-          <button class="deleteBtn px-2 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700" data-id="${r.id}">Delete</button>
+  if (error) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" class="text-center text-red-600 py-6">
+          Error loading report
         </td>
-      `;
-      tbody.appendChild(tr);
-    });
-
-    attachButtonEvents();
+      </tr>`;
+    console.error(error);
+    return;
   }
 
-  // Attach Edit/Delete button events
-  function attachButtonEvents(){
-    document.querySelectorAll(".deleteBtn").forEach(btn => {
-      btn.onclick = async () => {
-        const id = btn.dataset.id;
-        const result = await Swal.fire({
-          title: "Are you sure?",
-          text: "This response will be deleted permanently!",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#d33",
-          cancelButtonColor: "#3085d6",
-          confirmButtonText: "Yes, delete it!"
-        });
-        if(result.isConfirmed){
-          const { error } = await client.from("response").delete().eq("id", id);
-          if(error) Swal.fire("Error", error.message, "error");
-          else Swal.fire("Deleted!", "Response has been deleted.", "success");
-          loadResponses();
-        }
-      };
-    });
-
-    document.querySelectorAll(".editBtn").forEach(btn => {
-      btn.onclick = async () => {
-        const id = btn.dataset.id;
-        const { data, error } = await client.from("response").select("*").eq("id", id).single();
-        if(error) return Swal.fire("Error", error.message, "error");
-
-        const { value: answer } = await Swal.fire({
-          title: "Edit Answer",
-          input: 'text',
-          inputLabel: 'Answer',
-          inputValue: data.answer,
-          showCancelButton: true,
-          inputValidator: (value) => !value && "Answer cannot be empty",
-          allowOutsideClick: false,
-          customClass: { popup: "swal2-center" }
-        });
-
-        if(answer){
-          const { error: updateError } = await client.from("response").update({ answer }).eq("id", id);
-          if(updateError) return Swal.fire("Error", updateError.message, "error");
-          Swal.fire("Updated!", "Answer updated successfully.", "success");
-          loadResponses();
-        }
-      };
-    });
+  if (!data || data.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" class="text-center text-gray-500 py-6">
+          No responses found
+        </td>
+      </tr>`;
+    return;
   }
 
-  // Search filter
-  document.getElementById("searchEmail").addEventListener("input", e => {
-    loadResponses(e.target.value);
+  let i = 1;
+
+  data.forEach(row => {
+    const status = row.is_correct ? "✔ Pass" : "✘ Fail";
+    const statusColor = row.is_correct ? "text-green-600" : "text-red-600";
+
+    const tr = document.createElement("tr");
+    tr.className = "hover:bg-blue-50";
+
+    tr.innerHTML = `
+      <td class="px-4 py-3">${i++}</td>
+      <td class="px-4 py-3">${row.user_email}</td>
+      <td class="px-4 py-3">${row.admin?.qText || "N/A"}</td>
+      <td class="px-4 py-3">${row.answer || "-"}</td>
+      <td class="px-4 py-3 font-semibold ${statusColor}">${status}</td>
+      <td class="px-4 py-3">${row.comment || "-"}</td>
+      <td class="px-4 py-3">${new Date(row.created_at).toLocaleString()}</td>
+    `;
+    tbody.appendChild(tr);
   });
+}
 
-  // Initial load
-  loadResponses();
+loadReport();
 </script>
 
 </body>
