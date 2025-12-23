@@ -7,35 +7,54 @@
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<style>
+body{
+  font-family:Poppins,sans-serif;
+  background:linear-gradient(135deg,#e3f2fd,#bbdefb);
+}
+</style>
 </head>
 
-<body class="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen p-6">
+<body class="min-h-screen p-6">
 
 <div class="max-w-7xl mx-auto">
 
-  <h1 class="text-3xl font-extrabold text-blue-900 mb-6">📊 Admin Report</h1>
+  <!-- PAGE HEADER -->
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-3xl font-extrabold text-blue-900">
+      📊 Admin Report
+    </h1>
+    <span class="text-sm bg-blue-100 text-blue-800 px-4 py-1 rounded-full">
+      Survey Responses
+    </span>
+  </div>
 
-  <div class="bg-white rounded-2xl shadow-xl overflow-x-auto">
+  <!-- TABLE CARD -->
+  <div class="bg-white/70 backdrop-blur-xl border border-blue-200 rounded-2xl shadow-xl overflow-x-auto">
+
     <table class="min-w-full text-sm text-gray-700">
-      <thead class="bg-blue-100 text-blue-900">
-        <tr>
+      <thead>
+        <tr class="bg-blue-600 text-white text-left">
           <th class="px-4 py-3">#</th>
           <th class="px-4 py-3">User Email</th>
           <th class="px-4 py-3">Question</th>
           <th class="px-4 py-3">Answer</th>
-          <th class="px-4 py-3">Result</th>
+          <th class="px-4 py-3 text-center">Result</th>
           <th class="px-4 py-3">Comment</th>
           <th class="px-4 py-3">Date</th>
         </tr>
       </thead>
+
       <tbody id="reportBody"></tbody>
     </table>
+
   </div>
 
 </div>
 
 <script>
-/* ===== SUPABASE CONFIG (REAL KEY) ===== */
+/* ===== SUPABASE CONFIG ===== */
 const SUPABASE_URL = "https://jzorrdpsvtvoglvxhjfi.supabase.co";
 const SUPABASE_ANON_KEY =
 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6b3JyZHBzdnR2b2dsdnhoamZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNDA3MzMsImV4cCI6MjA3NjYxNjczM30.HOrkOrtH03AS-q9W-E0w7woDS2ESPDIVBaS64qzDpZw";
@@ -69,7 +88,6 @@ async function loadReport() {
           Error loading report
         </td>
       </tr>`;
-    console.error(error);
     return;
   }
 
@@ -86,26 +104,45 @@ async function loadReport() {
   let i = 1;
 
   data.forEach(row => {
-    const status = row.is_correct ? "✔ Pass" : "✘ Fail";
-    const statusColor = row.is_correct ? "text-green-600" : "text-red-600";
 
     const tr = document.createElement("tr");
-    tr.className = "hover:bg-blue-50";
+    tr.className = "border-b hover:bg-blue-50 transition";
 
     tr.innerHTML = `
-      <td class="px-4 py-3">${i++}</td>
-      <td class="px-4 py-3">${row.user_email}</td>
-      <td class="px-4 py-3">${row.admin?.qText || "N/A"}</td>
-      <td class="px-4 py-3">${row.answer || "-"}</td>
-      <td class="px-4 py-3 font-semibold ${statusColor}">${status}</td>
-      <td class="px-4 py-3">${row.comment || "-"}</td>
-      <td class="px-4 py-3">${new Date(row.created_at).toLocaleString()}</td>
+      <td class="px-4 py-3 font-semibold">${i++}</td>
+
+      <td class="px-4 py-3 text-blue-800">
+        ${row.user_email}
+      </td>
+
+      <td class="px-4 py-3 max-w-sm">
+        ${row.admin?.qText || "N/A"}
+      </td>
+
+      <td class="px-4 py-3">
+        ${row.answer || "-"}
+      </td>
+
+      <td class="px-4 py-3 text-center font-bold ${
+        row.is_correct ? "text-green-600" : "text-red-600"
+      }">
+        ${row.is_correct ? "✔ Pass" : "✘ Fail"}
+      </td>
+
+      <td class="px-4 py-3">
+        ${row.comment || "-"}
+      </td>
+
+      <td class="px-4 py-3 text-sm text-gray-500">
+        ${new Date(row.created_at).toLocaleString()}
+      </td>
     `;
+
     tbody.appendChild(tr);
   });
 }
 
-loadReport();
+document.addEventListener("DOMContentLoaded", loadReport);
 </script>
 
 </body>

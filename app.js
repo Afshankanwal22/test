@@ -85,338 +85,111 @@ signupForm?.addEventListener("submit", async (e) => {
     }
   });
 
-// ====== Add Question Form ======
+let editId=null;
 
- document.addEventListener("DOMContentLoaded", () => {
-    const saveBtn = document.getElementById("saveBtn");
-    
-    saveBtn && saveBtn.addEventListener("click", async () => {
-        const type = document.getElementById("qType").value;
-        const failMessage = document.getElementById("failMessage").value;
+async function loadQuestions(){
+const {data,error}=await client.from("admin").select("*").order("id");
+const table=document.getElementById("questionsTable");
+table.innerHTML="";
 
-        let question = { qType: type, failMessage };
-
-        if(type === "multiple") {
-            question.qText = document.getElementById("mq").value;
-            question.A = document.getElementById("ma").value;
-            question.B = document.getElementById("mb").value;
-            question.C = document.getElementById("mc").value;
-            question.D = document.getElementById("md").value;
-            question.correct = document.getElementById("mcorrect").value;
-        } else if(type === "tf") {
-            question.qText = document.getElementById("tfq").value;
-            question.correct = document.getElementById("tfCorrect").value;
-        } else if(type === "data") {
-            question.qText = document.getElementById("dq").value;
-            question.correct = null;
-        } else {
-            Swal.fire({ icon: "error", title: "Error", text: "Select a question type!" });
-            return;
-        }
-
-        if(!question.qText) {
-            Swal.fire({ icon: "error", title: "Error", text: "Enter question text!" });
-            return;
-        }
-
-        const { data, error } = await client.from('admin').insert([question]);
-
-        if(error) {
-            Swal.fire({ icon: "error", title: "Error", text: error.message });
-        } else {
-            Swal.fire({ icon: "success", title: "Saved!", text: "Question added successfully!", timer: 1500, showConfirmButton: false });
-            clearForm();
-        }
-    });
-
-    function clearForm() {
-        document.getElementById("mq").value = "";
-        document.getElementById("ma").value = "";
-        document.getElementById("mb").value = "";
-        document.getElementById("mc").value = "";
-        document.getElementById("md").value = "";
-        document.getElementById("mcorrect").value = "A";
-
-        document.getElementById("tfq").value = "";
-        document.getElementById("tfCorrect").value = "True";
-
-        document.getElementById("dq").value = "";
-        document.getElementById("failMessage").value = "";
-
-        document.getElementById("qType").value = "";
-        document.getElementById("multipleForm").classList.add("hidden");
-        document.getElementById("tfForm").classList.add("hidden");
-        document.getElementById("dataForm").classList.add("hidden");
-    }
-});
-
-// ADMIN REPORT
-const adminReport=document.getElementById("tabAdminReport")
-adminReport && adminReport.addEventListener("click", async () => {
-    window.location.href = "admin.html";
-// Load Admin Report Automatically
-    loadAdminReport();
-})
-
-   // ====== Fetch and Render Admin Report ======
-// ====== Load Admin Responses as Responsive Cards ======
-// async function loadAdminReport() {
-//     const box = document.getElementById("adminReport");
-
-//     // Wrap in responsive grid
-//     box.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="cardsGrid"></div>`;
-//     const grid = document.getElementById("cardsGrid");
-
-//     // Fetch all responses
-//     const { data, error } = await client
-//         .from("response")
-//         .select(`
-//             id,
-//             user_email,
-//             user_id,
-//             answer,
-//             comment,
-//             is_correct,
-//             created_at,
-//             question:question_id (qText)
-//         `)
-//         .order("created_at", { ascending: false });
-
-//     if (error) {
-//         grid.innerHTML = `<p class="text-red-500 col-span-full text-center">Error: ${error.message}</p>`;
-//         return;
-//     }
-
-//     if (!data || data.length === 0) {
-//         grid.innerHTML = "<p class='text-gray-500 col-span-full text-center'>No responses found.</p>";
-//         return;
-//     }
-
-//     // Render each response as a card
-//     data.forEach((r) => {
-//         const card = document.createElement("div");
-//         card.className = "bg-white border border-gray-200 rounded-xl shadow-md p-6 hover:shadow-lg transition duration-300";
-
-//         card.innerHTML = `
-//             <div id="response-${r.id}" class="space-y-2">
-//                 <p id="userEmail-${r.id}" class="font-semibold text-purple-700 text-sm truncate">📩 ${r.user_email}</p>
-//                 <p id="question-${r.id}" class="text-gray-800 font-medium"><b>Question:</b> ${r.question?.qText || "N/A"}</p>
-//                 <p id="answer-${r.id}" class="text-gray-700"><b>Answer:</b> ${r.answer}</p>
-//                 <p id="correct-${r.id}" class="">
-//                     <b>Status:</b> 
-//                     <span class="${r.is_correct ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}">
-//                         ${r.is_correct ? "✔ Correct" : "✘ Incorrect"}
-//                     </span>
-//                 </p>
-//                 <p id="comment-${r.id}" class="text-gray-600"><b>Comment:</b> ${r.comment || "No comments"}</p>
-//                 <p id="submitted-${r.id}" class="text-xs text-gray-400 mt-1">Submitted: ${new Date(r.created_at).toLocaleString()}</p>
-//             </div>
-//         `;
-
-//         grid.appendChild(card);
-//     });
-// }
-
-// // Auto load on page open
-// document.addEventListener("DOMContentLoaded", loadAdminReport);
-
-// USER QUIZ FUNCTIONALITY
-
-    const questionsBox = document.getElementById("questionsBox");
-    const submitBtns = document.getElementById("submitBtns");
-    const resultBox = document.getElementById("resultBox");
-
-    let questions = [];
-    let currentIndex = 0;
-    let userResponses = [];
-     let totalTime = 600; // 10 minutes
-      let timerInterval = null;
-
-       // ====================== TIMER FUNCTION ======================
-  function startTimer() {
-    if (timerInterval) clearInterval(timerInterval);
-    const timerDisplay = document.getElementById("timerDisplay");
-
-    timerInterval = setInterval(() => {
-      let minutes = Math.floor(totalTime / 60);
-      let seconds = totalTime % 60;
-
-      minutes = minutes < 10 ? "0" + minutes : minutes;
-      seconds = seconds < 10 ? "0" + seconds : seconds;
-
-      timerDisplay.innerHTML = `Time Left: ${minutes}:${seconds}`;
-
-      if (totalTime <= 0) {
-        clearInterval(timerInterval);
-        autoSubmitQuiz();
-      }
-      totalTime--;
-    }, 1000);
-  }
-
-  // ====================== AUTO SUBMIT WHEN TIME ENDS ======================
-  function autoSubmitQuiz() {
-    Swal.fire({
-      icon: "warning",
-      title: "Time's Up!",
-      text: "Your quiz time is over.",
-      confirmButtonColor: "#d33",
-    }).then(() => {
-      calculateResults(); // Your result function
-    });
-  }
-
-    // // ====== Load Questions ======
-    // async function loadQuestionsOneByOne() {
-    //   const { data, error } = await client.from('admin').select('*').order('id', { ascending: true });
-    //   if (error) return Swal.fire({ icon: "error", text: error.message });
-    //   if (!data || data.length === 0) {
-    //     questionsBox.innerHTML = `<p class="text-gray-500 text-center">No questions available.</p>`;
-    //     submitBtns.classList.add("hidden");
-    //     return;
-    //   }
-    //   questions = data;
-    //   currentIndex = 0;
-    //   showQuestion(currentIndex);
-    //     startTimer();
-    // }
-
-    // ====== Show Single Question ======
-    function showQuestion(index) {
-      const q = questions[index];
-      if (!q) return;
-      questionsBox.innerHTML = `
-<div class="bg-white p-6 rounded-2xl shadow-lg space-y-4 border border-red-200 transition hover:shadow-2xl">
-  <div class="flex justify-between items-center mb-3">
-    <span class="text-sm text-red-600 font-semibold">Question ${index+1} of ${questions.length}</span>
-    <div class="w-1/2 h-2 bg-red-100 rounded-full overflow-hidden">
-      <div class="h-full bg-red-600 rounded-full" style="width: ${(index+1)/questions.length*100}%"></div>
-    </div>
-  </div>
-  <p class="text-gray-800 text-lg font-semibold leading-relaxed max-h-40 overflow-y-auto pr-2">
-    ${q.qText}
-  </p>
-  <div id="optionsBox" class="space-y-2">
-    ${q.qType === 'multiple' ? ['A','B','C','D'].map(opt => `
-      <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-red-50 transition duration-200">
-        <input type="radio" name="q${q.id}" value="${q[opt]}" class="mr-3 h-5 w-5 accent-red-600">
-        <span class="text-gray-700 font-medium">${q[opt]}</span>
-      </label>
-    `).join('') : q.qType === 'tf' ? ['True','False'].map(opt => `
-      <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-red-50 transition duration-200">
-        <input type="radio" name="q${q.id}" value="${opt}" class="mr-3 h-5 w-5 accent-red-600">
-        <span class="text-gray-700 font-medium">${opt}</span>
-      </label>
-    `).join('') : `<p class="text-gray-500 italic text-sm">*This is an informational question.</p>`}
-  </div>
-  
-</div>`;
-
-      submitBtns.innerText = currentIndex < questions.length - 1 ? "Next" : "Submit Quiz";
-    }
-//================ next /btton   =====================//
-    submitBtns.addEventListener("click", async () => {
-      let isFinalCommentStep = false; 
-  if (!isFinalCommentStep) {
-
-    // --- Handle question answers ---
-    const q = questions[currentIndex];
-    const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
-    
-    // Only read comment if the element exists
-    const commentEl = document.getElementById(`comment-${q.id}`);
-    const comment = commentEl ? commentEl.value : null;
-
-    const answer = selected ? selected.value : null;
-    const is_correct = answer === q.correct;
-
-    userResponses[currentIndex] = { question_id: q.id, answer, is_correct, comment };
-
-    if (currentIndex === questions.length - 1) {
-      // Last question → show final comment
-      showCommentBox();
-    } else {
-      currentIndex++;
-      showQuestion(currentIndex);
-    }
-
-  } else {
-    // --- Handle final comment submission ---
-    const finalComment = document.getElementById('finalComment')?.value || null;
-
-    // Save final comment as a special entry
-    userResponses.push({ question_id: null, answer: null, is_correct: null, comment: finalComment });
-
-    // Submit all responses
-    await submitAllResponses();
-  }
-});
-
-    function showCommentBox() {
-       isFinalCommentStep = true; 
-  questionsBox.innerHTML = `
-    <div class="bg-white p-6 rounded-2xl shadow-lg space-y-4 border border-red-200">
-      <h2 class="text-xl font-bold text-center">Add your final comment (optional)</h2>
-      <textarea id="finalComment" class="w-full p-3 border border-red-300 rounded-xl mt-3 resize-none text-gray-700" rows="3"></textarea>
-    </div>
-  `;
-  submitBtns.innerText = "Submit Quiz";
-  submitBtns.onclick = submitAllResponses; // now this will handle final comment
- 
+if(error){
+Swal.fire("Error",error.message,"error");
+return;
 }
 
+if(!data.length){
+table.innerHTML=`<tr><td colspan="5" class="text-center py-4">No Data</td></tr>`;
+return;
+}
 
-    // ====== Submit all responses ======
-    async function submitAllResponses() {
-      const { data: userData } = await client.auth.getUser();
-      if (!userData.user) return Swal.fire("Please login first!", "", "error");
+data.forEach((q,i)=>{
+const row=document.createElement("tr");
+row.className="border-b hover:bg-blue-50";
 
-      const email = userData.user.email;
-      const user_id = userData.user.id;
+row.innerHTML=`
+<td class="p-3">${i+1}</td>
+<td class="p-3">${q.qText}</td>
+<td class="p-3">${q.qType}</td>
+<td class="p-3 font-semibold text-blue-700">${q.correct||"-"}</td>
+<td class="p-3 text-center space-x-2">
+<button class="editBtn bg-yellow-400 text-white px-3 py-1 rounded"
+data-id="${q.id}"
+data-text="${q.qText}"
+data-correct="${q.correct||""}">
+Edit
+</button>
 
-      const responsesToInsert = userResponses.map(r => ({
-        user_email: email,
-        user_id: user_id,
-        question_id: r.question_id,
-        answer: r.answer,
-        is_correct: r.is_correct,
-        comment: r.comment
-      }));
+<button class="deleteBtn bg-red-500 text-white px-3 py-1 rounded"
+data-id="${q.id}">
+Delete
+</button>
+</td>
+`;
+table.appendChild(row);
+});
 
-      const { error } = await client.from("response").insert(responsesToInsert);
-      if (error) return Swal.fire("Error saving responses", error.message, "error");
+/* SAME FUNCTIONALITY AS YOUR CODE */
+document.querySelectorAll(".editBtn").forEach(btn=>{
+btn.addEventListener("click",()=>{
+openEdit(btn.dataset.id,btn.dataset.text,btn.dataset.correct);
+});
+});
 
-      questionsBox.innerHTML = "";
-      submitBtns.classList.add("hidden");
-      resultBox.classList.remove("hidden");
+document.querySelectorAll(".deleteBtn").forEach(btn=>{
+btn.addEventListener("click",()=>{
+deleteQuestion(btn.dataset.id);
+});
+});
+}
 
-      const correctCount = userResponses.filter(r => r.is_correct).length;
-      const wrongCount = userResponses.filter(r => r.is_correct === false).length;
+function openEdit(id,text,correct){
+editId=id;
+editQText.value=text;
+editCorrect.value=correct;
 
-      resultBox.innerHTML = `
-        <div class="bg-white/80 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-red-200 max-w-xl mx-auto text-center space-y-4">
-          <h2 class="text-3xl font-extrabold text-gray-800 drop-shadow-sm">Quiz Completed!</h2>
-          <div class="flex justify-between text-lg font-medium mt-4">
-            <span>Total Questions:</span>
-            <span class="text-gray-700">${questions.length}</span>
-          </div>
-          <div class="flex justify-between text-lg font-medium text-green-700">
-            <span>Correct Answers:</span>
-            <span>${correctCount}</span>
-          </div>
-          <div class="flex justify-between text-lg font-medium text-red-700">
-            <span>Wrong Answers:</span>
-            <span>${wrongCount}</span>
-          </div>
-          <a href="user.html">
-            <button class="mt-6 bg-blue-600 text-white py-3 px-6 rounded-full font-semibold shadow-lg 
-                 hover:bg-blue-700 hover:shadow-xl transition-all duration-300">
-              Retry Quiz
-            </button>
-          </a>
-        </div>
-      `;
-    }
+editModal.classList.remove("hidden");
+setTimeout(()=>editBox.classList.add("show"),50);
+}
 
-    // ====== Initialize ======
-    document.addEventListener("DOMContentLoaded", loadQuestionsOneByOne);
+cancelEdit.onclick=()=>{
+editBox.classList.remove("show");
+setTimeout(()=>editModal.classList.add("hidden"),200);
+};
+
+updateBtn.onclick=async()=>{
+const qText=editQText.value;
+const correct=editCorrect.value;
+
+if(!qText){
+Swal.fire("Error","Question empty","error");
+return;
+}
+
+const {error}=await client.from("admin")
+.update({qText,correct})
+.eq("id",editId);
+
+if(error){
+Swal.fire("Error",error.message,"error");
+return;
+}
+
+Swal.fire("Updated","Saved successfully","success");
+cancelEdit.click();
+loadQuestions();
+};
+
+async function deleteQuestion(id){
+const res=await Swal.fire({
+title:"Delete?",
+icon:"warning",
+showCancelButton:true
+});
+if(res.isConfirmed){
+await client.from("admin").delete().eq("id",id);
+Swal.fire("Deleted","Removed","success");
+loadQuestions();
+}
+}
+
+document.addEventListener("DOMContentLoaded",loadQuestions);

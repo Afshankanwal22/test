@@ -32,136 +32,124 @@
 </style>
 </head>
 
-<body class="min-h-screen flex items-center justify-center p-6 relative">
+<body class="min-h-screen flex items-start justify-center p-6 pt-32 relative">
 
-
-    <!-- NAVBAR -->
+<!-- ================= NAVBAR ================= -->
 <nav class="w-full bg-white/60 backdrop-blur-md shadow-md border-b border-blue-200 fixed top-0 left-0 z-50">
   <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
     <div class="flex items-center gap-3">
       <div class="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center font-bold text-blue-800">H</div>
       <span class="text-xl font-bold text-blue-900">Survey Admin</span>
     </div>
+
     <ul class="hidden md:flex items-center gap-6 text-blue-800 font-semibold">
       <li><a href="viewQuestion.html" class="hover:text-blue-900 transition">View Questions</a></li>
       <li><a href="adminReport.html" class="hover:text-blue-900 transition">Reports</a></li>
-      
     </ul>
-    <!-- Mobile Menu Button -->
+
     <div class="md:hidden">
-      <button id="menuBtn" class="text-blue-800 focus:outline-none">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
-        </svg>
+      <button id="menuBtn" class="text-blue-800">
+        ☰
       </button>
     </div>
   </div>
-  <!-- Mobile Menu -->
-  <div id="mobileMenu" class="hidden md:hidden bg-white/70 backdrop-blur-md border-t border-blue-200">
-    <ul class="flex flex-col gap-3 p-4 text-blue-800 font-semibold">
-      <li><a href="#addQuestion" class="hover:text-blue-900 transition">Add Question</a></li>
-      <li><a href="#viewQuestions" class="hover:text-blue-900 transition">View Questions</a></li>
-      <li><a href="#reports" class="hover:text-blue-900 transition">Reports</a></li>
-      <li><a href="#settings" class="hover:text-blue-900 transition">Settings</a></li>
-    </ul>
-  </div>
 </nav>
 
-<!-- ANIMATED VIRUS ICONS -->
-<img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png" class="virus" style="top: 5%; left: 10%;">
-<img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png" class="virus" style="top: 70%; left: 80%; width: 70px; animation-delay: 2s;">
-<img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png" class="virus" style="top: 40%; left: -5%; width: 110px; animation-delay: 4s;">
-<img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png" class="virus" style="top: 80%; left: 30%; width: 60px; animation-delay: 1s;">
+<!-- ================= FLOATING VIRUS ICONS ================= -->
+<img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png" class="virus" style="top: 10%; left: 10%;">
+<img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png" class="virus" style="top: 70%; left: 80%; width: 70px;">
+<img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png" class="virus" style="top: 40%; left: -5%; width: 110px;">
+<img src="https://cdn-icons-png.flaticon.com/512/2785/2785819.png" class="virus" style="top: 85%; left: 30%; width: 60px;">
 
-<div class="w-full max-w-3xl bg-white/60 backdrop-blur-2xl rounded-3xl shadow-2xl p-10  border border-blue-300/40">
+<!-- ================= MAIN CARD ================= -->
+<div class="w-full max-w-3xl bg-white/60 backdrop-blur-2xl rounded-3xl shadow-2xl p-10 border border-blue-300/40">
 
-    <!-- Admin Panel Button -->
-    <div class="flex justify-end mb-6">
-        <button id="tabAdminReport" class="px-5 py-2 bg-blue-100 hover:bg-blue-200 rounded-xl font-semibold text-blue-800 transition shadow">
-            Admin Panel
-        </button>
-    </div>
+  <!-- Header -->
+  <div class="text-center mb-6">
+    <h1 class="text-3xl font-extrabold text-blue-900 drop-shadow-md">
+      COVID-19 Survey Admin Panel
+    </h1>
+    <p class="text-blue-600 text-sm mt-1">
+      Create & manage health survey questions professionally
+    </p>
+  </div>
 
-    <!-- Heading -->
-    <div class="text-center mb-2">
-        <h1 class="text-3xl font-extrabold text-blue-900 drop-shadow-md">Admin Survey Builder</h1>
-        <p class="text-blue-600 text-sm">Create and Manage COVID-19 Survey Questions</p>
-    </div>
+  <!-- Question Type -->
+  <div class="mb-4">
+    <label class="block font-semibold mb-2 text-blue-900">
+      Select Question Type
+    </label>
+    <select id="qType" onchange="showForm()"
+      class="w-full p-3 rounded-xl border border-blue-300 bg-white/80 focus:ring-2 focus:ring-blue-500">
+      <option value="">-- Select Type --</option>
+      <option value="multiple">Multiple Choice</option>
+      <option value="tf">True / False</option>
+      <option value="data">Data (Info Only)</option>
+    </select>
+  </div>
 
-    <h2 class="text-xl font-bold text-blue-900 mt-8 mb-4 text-center">Add Survey Question</h2>
+  <!-- Multiple Choice -->
+  <div id="multipleForm" class="hidden bg-blue-50/60 p-5 rounded-2xl border border-blue-200 space-y-3">
+    <textarea id="mq" placeholder="Enter question..."
+      class="w-full p-3 rounded-xl border border-blue-300"></textarea>
+    <input id="ma" placeholder="Option A" class="w-full p-3 rounded-xl border border-blue-300">
+    <input id="mb" placeholder="Option B" class="w-full p-3 rounded-xl border border-blue-300">
+    <input id="mc" placeholder="Option C" class="w-full p-3 rounded-xl border border-blue-300">
+    <input id="md" placeholder="Option D" class="w-full p-3 rounded-xl border border-blue-300">
 
-    <!-- Question Type Selector -->
-    <div>
-        <label class="block font-semibold mb-2 text-blue-900">Select Question Type:</label>
-        <select id="qType" onchange="showForm()"
-            class="w-full p-3 rounded-xl border border-blue-300 bg-white/80 focus:ring-2 focus:ring-blue-500 transition">
-            <option value="">-- Select Type --</option>
-            <option value="multiple">Multiple Choice</option>
-            <option value="tf">True / False</option>
-            <option value="data">Data (Info Only)</option>
-        </select>
-    </div>
+    <select id="mcorrect" class="w-full p-3 rounded-xl border border-blue-300">
+      <option value="A">Correct: A</option>
+      <option value="B">Correct: B</option>
+      <option value="C">Correct: C</option>
+      <option value="D">Correct: D</option>
+    </select>
+  </div>
 
-    <!-- Multiple Choice Form -->
-    <div id="multipleForm" class="hidden bg-blue-50/60 p-5 rounded-2xl shadow-inner border border-blue-200 space-y-3 mt-4">
-        <textarea id="mq" placeholder="Enter your question..."
-            class="w-full p-3 rounded-xl border border-blue-300 focus:ring-2 focus:ring-blue-400"></textarea>
-        <input id="ma" placeholder="Option A" class="w-full p-3 rounded-xl border border-blue-300">
-        <input id="mb" placeholder="Option B" class="w-full p-3 rounded-xl border border-blue-300">
-        <input id="mc" placeholder="Option C" class="w-full p-3 rounded-xl border border-blue-300">
-        <input id="md" placeholder="Option D" class="w-full p-3 rounded-xl border border-blue-300">
+  <!-- True False -->
+  <div id="tfForm" class="hidden bg-blue-50/60 p-5 rounded-2xl border border-blue-200 space-y-3">
+    <textarea id="tfq" placeholder="Enter question..."
+      class="w-full p-3 rounded-xl border border-blue-300"></textarea>
+    <select id="tfCorrect" class="w-full p-3 rounded-xl border border-blue-300">
+      <option value="True">True</option>
+      <option value="False">False</option>
+    </select>
+  </div>
 
-        <select id="mcorrect" class="w-full p-3 rounded-xl border border-blue-300 bg-white focus:ring-2">
-            <option value="A">Option A</option>
-            <option value="B">Option B</option>
-            <option value="C">Option C</option>
-            <option value="D">Option D</option>
-        </select>
-    </div>
+  <!-- Data -->
+  <div id="dataForm" class="hidden bg-blue-50/60 p-5 rounded-2xl border border-blue-200">
+    <textarea id="dq" placeholder="Enter informational content..."
+      class="w-full p-3 rounded-xl border border-blue-300"></textarea>
+    <p class="text-sm text-blue-600 italic mt-1">
+      *Informational question (no answer)
+    </p>
+  </div>
 
-    <!-- True/False Form -->
-    <div id="tfForm" class="hidden bg-blue-50/60 p-5 rounded-2xl shadow-inner border border-blue-200 space-y-3 mt-4">
-        <textarea id="tfq" placeholder="Enter your question..."
-            class="w-full p-3 rounded-xl border border-blue-300 focus:ring-2 focus:ring-blue-400"></textarea>
+  <!-- Fail Message -->
+  <div class="mt-5">
+    <label class="block font-semibold text-blue-900 mb-1">
+      Fail Response (optional)
+    </label>
+    <input id="failMessage" placeholder="Enter fail response..."
+      class="w-full p-3 rounded-xl border border-blue-300">
+  </div>
 
-        <select id="tfCorrect" class="w-full p-3 rounded-xl border border-blue-300 bg-white">
-            <option value="True">True</option>
-            <option value="False">False</option>
-        </select>
-    </div>
-
-    <!-- Data Only Form -->
-    <div id="dataForm" class="hidden bg-blue-50/60 p-5 rounded-2xl shadow-inner border border-blue-200 space-y-2 mt-4">
-        <textarea id="dq" placeholder="Enter data question..."
-            class="w-full p-3 rounded-xl border border-blue-300"></textarea>
-        <p class="text-blue-600 text-sm italic">*Informational question — no correct answer.</p>
-    </div>
-
-    <!-- Fail Message -->
-    <div class="mt-6">
-        <label class="block font-semibold mb-1 text-blue-900">Fail Response (optional):</label>
-        <input id="failMessage" placeholder="Enter fail response..."
-            class="w-full p-3 rounded-xl border border-blue-300 bg-white focus:ring-2 focus:ring-blue-400">
-    </div>
-
-    <!-- Save Button -->
-    <button id="saveBtn"
-        class="w-full mt-6 bg-blue-700 hover:bg-blue-800 py-3 rounded-2xl font-bold text-white text-lg transition shadow-xl hover:scale-105">
-        Save Question
-    </button>
-
+  <!-- Save -->
+  <button id="saveBtn"
+    class="w-full mt-6 bg-blue-700 hover:bg-blue-800 text-white py-3 rounded-2xl font-bold text-lg shadow-xl transition hover:scale-105">
+    Save Question
+  </button>
 </div>
 
 <script>
 function showForm() {
-    document.getElementById("multipleForm").classList.add("hidden");
-    document.getElementById("tfForm").classList.add("hidden");
-    document.getElementById("dataForm").classList.add("hidden");
+  document.getElementById("multipleForm").classList.add("hidden");
+  document.getElementById("tfForm").classList.add("hidden");
+  document.getElementById("dataForm").classList.add("hidden");
 
-    const type = document.getElementById("qType").value;
-    if(type === "multiple") document.getElementById("multipleForm").classList.remove("hidden");
-    if(type === "tf") document.getElementById("tfForm").classList.remove("hidden");
-    if(type === "data") document.getElementById("dataForm").classList.remove("hidden");
+  const type = document.getElementById("qType").value;
+  if(type === "multiple") multipleForm.classList.remove("hidden");
+  if(type === "tf") tfForm.classList.remove("hidden");
+  if(type === "data") dataForm.classList.remove("hidden");
 }
 </script>
 
