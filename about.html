@@ -3,105 +3,128 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>About COVID-19</title>
+<title>COVID-19 Awareness</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-blue-100 text-gray-800">
 
-<!-- HERO SECTION -->
-<section class="py-20">
-  <div class="max-w-7xl mx-auto px-6 text-center">
-    <h1 class="text-4xl md:text-5xl font-extrabold text-blue-900 mb-4">About COVID-19</h1>
-    <p class="text-lg md:text-xl mb-6">Learn about COVID-19, its symptoms, prevention, and stay informed with reliable updates.</p>
-    <a href="#stats" class="inline-block bg-blue-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition transform">Latest Stats</a>
+<body class="bg-gradient-to-br from-blue-100 via-blue-50 to-indigo-100 text-gray-800">
+
+<!-- HERO -->
+<section class="min-h-screen flex items-center justify-center">
+  <div class="text-center max-w-3xl px-6">
+    <h1 class="text-5xl md:text-6xl font-extrabold text-blue-900 mb-6">
+      COVID-19 Awareness
+    </h1>
+    <p class="text-lg md:text-xl text-gray-700 mb-8">
+      Stay informed. Stay protected. Learn about symptoms, prevention and global updates.
+    </p>
+    <a href="#stats"
+       class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-full shadow-xl transition transform hover:scale-105">
+       View Live Statistics
+    </a>
   </div>
 </section>
 
-<!-- STATS SECTION -->
-<section id="stats" class="py-20">
+<!-- STATS -->
+<section id="stats" class="py-24">
   <div class="max-w-7xl mx-auto px-6 text-center">
-    <h2 class="text-3xl font-bold mb-12">Global Statistics</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-      <div class="bg-white/70 backdrop-blur-lg rounded-2xl shadow-md p-6 hover:shadow-xl transition">
-        <h3 class="text-xl font-semibold mb-2 text-red-600">Cases</h3>
-        <p class="text-3xl font-bold text-gray-800">450M+</p>
+    <h2 class="text-4xl font-bold mb-14 text-blue-900">Global COVID-19 Stats</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+      <div class="glass-card border-red-200">
+        <p class="text-red-600 text-4xl font-bold">450M+</p>
+        <h3 class="mt-2 font-semibold">Total Cases</h3>
       </div>
-      <div class="bg-white/70 backdrop-blur-lg rounded-2xl shadow-md p-6 hover:shadow-xl transition">
-        <h3 class="text-xl font-semibold mb-2 text-green-600">Recovered</h3>
-        <p class="text-3xl font-bold text-gray-800">430M+</p>
+      <div class="glass-card border-green-200">
+        <p class="text-green-600 text-4xl font-bold">430M+</p>
+        <h3 class="mt-2 font-semibold">Recovered</h3>
       </div>
-      <div class="bg-white/70 backdrop-blur-lg rounded-2xl shadow-md p-6 hover:shadow-xl transition">
-        <h3 class="text-xl font-semibold mb-2 text-yellow-600">Active</h3>
-        <p class="text-3xl font-bold text-gray-800">15M+</p>
+      <div class="glass-card border-yellow-200">
+        <p class="text-yellow-600 text-4xl font-bold">15M+</p>
+        <h3 class="mt-2 font-semibold">Active</h3>
       </div>
-      <div class="bg-white/70 backdrop-blur-lg rounded-2xl shadow-md p-6 hover:shadow-xl transition">
-        <h3 class="text-xl font-semibold mb-2 text-gray-600">Deaths</h3>
-        <p class="text-3xl font-bold text-gray-800">6M+</p>
+      <div class="glass-card border-gray-300">
+        <p class="text-gray-700 text-4xl font-bold">6M+</p>
+        <h3 class="mt-2 font-semibold">Deaths</h3>
       </div>
     </div>
   </div>
 </section>
 
-<!-- PREVENTION SECTION -->
-<section class="py-20">
+<!-- PREVENTION -->
+<section class="py-24 bg-white/40 backdrop-blur">
   <div class="max-w-7xl mx-auto px-6 text-center">
-    <h2 class="text-3xl font-bold mb-12">Prevention & Safety Measures</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="bg-white/70 backdrop-blur-lg rounded-2xl shadow-md p-6 hover:shadow-xl transition">
-        <div class="text-red-600 text-4xl mb-4">😷</div>
-        <h3 class="font-semibold text-xl mb-2">Wear Masks</h3>
-        <p class="text-gray-700">Always wear a mask in public spaces to reduce the spread of COVID-19.</p>
+    <h2 class="text-4xl font-bold mb-14 text-blue-900">Prevention & Safety</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+      <div class="glass-card hover:scale-105">
+        <div class="text-5xl mb-4">😷</div>
+        <h3 class="text-xl font-semibold mb-2">Wear Mask</h3>
+        <p>Use masks in public places to reduce virus spread.</p>
       </div>
-      <div class="bg-white/70 backdrop-blur-lg rounded-2xl shadow-md p-6 hover:shadow-xl transition">
-        <div class="text-green-600 text-4xl mb-4">🧴</div>
-        <h3 class="font-semibold text-xl mb-2">Sanitize Hands</h3>
-        <p class="text-gray-700">Use hand sanitizer regularly and wash hands thoroughly with soap.</p>
+      <div class="glass-card hover:scale-105">
+        <div class="text-5xl mb-4">🧴</div>
+        <h3 class="text-xl font-semibold mb-2">Hand Hygiene</h3>
+        <p>Wash hands regularly or use sanitizer.</p>
       </div>
-      <div class="bg-white/70 backdrop-blur-lg rounded-2xl shadow-md p-6 hover:shadow-xl transition">
-        <div class="text-yellow-600 text-4xl mb-4">↔️</div>
-        <h3 class="font-semibold text-xl mb-2">Social Distancing</h3>
-        <p class="text-gray-700">Maintain safe distance from others to prevent transmission.</p>
+      <div class="glass-card hover:scale-105">
+        <div class="text-5xl mb-4">↔️</div>
+        <h3 class="text-xl font-semibold mb-2">Distance</h3>
+        <p>Maintain social distancing in crowded areas.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- TEAM SECTION -->
-<section class="py-20 bg-blue-50">
+<!-- EXPERTS -->
+<section class="py-24">
   <div class="max-w-7xl mx-auto px-6 text-center">
-    <h2 class="text-3xl font-bold mb-12">Our Experts</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-      <div class="bg-white/70 backdrop-blur-lg rounded-2xl shadow-md p-6 hover:shadow-xl transition text-center">
-        <img src="https://i.pravatar.cc/150?img=32" alt="Expert" class="mx-auto rounded-full w-28 h-28 mb-4">
-        <h3 class="font-semibold text-xl mb-1">Dr. Afshan Kanwal</h3>
-        <p class="text-gray-700 text-sm">Epidemiologist & COVID Researcher</p>
+    <h2 class="text-4xl font-bold mb-14 text-blue-900">Our Medical Experts</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
+      <div class="glass-card">
+        <img src="https://i.pravatar.cc/150?img=32" class="mx-auto rounded-full w-28 h-28 mb-4">
+        <h3 class="font-semibold text-xl">Dr. Afshan Kanwal</h3>
+        <p class="text-sm text-gray-600">Epidemiologist</p>
       </div>
-      <div class="bg-white/70 backdrop-blur-lg rounded-2xl shadow-md p-6 hover:shadow-xl transition text-center">
-        <img src="https://i.pravatar.cc/150?img=12" alt="Expert" class="mx-auto rounded-full w-28 h-28 mb-4">
-        <h3 class="font-semibold text-xl mb-1">Dr. Ali Raza</h3>
-        <p class="text-gray-700 text-sm">Public Health Specialist</p>
+      <div class="glass-card">
+        <img src="https://i.pravatar.cc/150?img=12" class="mx-auto rounded-full w-28 h-28 mb-4">
+        <h3 class="font-semibold text-xl">Dr. Ali Raza</h3>
+        <p class="text-sm text-gray-600">Public Health Specialist</p>
       </div>
-      <div class="bg-white/70 backdrop-blur-lg rounded-2xl shadow-md p-6 hover:shadow-xl transition text-center">
-        <img src="https://i.pravatar.cc/150?img=16" alt="Expert" class="mx-auto rounded-full w-28 h-28 mb-4">
-        <h3 class="font-semibold text-xl mb-1">Dr. Sara Khan</h3>
-        <p class="text-gray-700 text-sm">Virologist & Research Analyst</p>
+      <div class="glass-card">
+        <img src="https://i.pravatar.cc/150?img=16" class="mx-auto rounded-full w-28 h-28 mb-4">
+        <h3 class="font-semibold text-xl">Dr. Sara Khan</h3>
+        <p class="text-sm text-gray-600">Virologist</p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- FOOTER -->
-<footer class="bg-blue-900 text-white py-10">
+<footer class="bg-blue-900 text-white py-12">
   <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
-    <p class="text-center md:text-left mb-4 md:mb-0">&copy; 2025 COVID Awareness. All rights reserved.</p>
+    <p class="mb-4 md:mb-0">&copy; 2025 COVID Awareness. All Rights Reserved.</p>
     <div class="flex space-x-6">
-      <a href="#" class="hover:text-gray-200 transition">Facebook</a>
-      <a href="#" class="hover:text-gray-200 transition">Twitter</a>
-      <a href="#" class="hover:text-gray-200 transition">Instagram</a>
-      <a href="#" class="hover:text-gray-200 transition">LinkedIn</a>
+      <a href="#" class="hover:text-blue-300">Facebook</a>
+      <a href="#" class="hover:text-blue-300">Twitter</a>
+      <a href="#" class="hover:text-blue-300">Instagram</a>
+      <a href="#" class="hover:text-blue-300">LinkedIn</a>
     </div>
   </div>
 </footer>
+
+<!-- REUSABLE GLASS STYLE -->
+<style>
+  .glass-card{
+    background: rgba(255,255,255,0.65);
+    backdrop-filter: blur(14px);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    transition: all .3s ease;
+  }
+</style>
 
 </body>
 </html>

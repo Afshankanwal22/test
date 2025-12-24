@@ -4,176 +4,193 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>User Quiz</title>
+
+<!-- Libraries -->
+<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+  /* Custom animations for smooth transitions */
+  .fade-in { animation: fadeIn 0.4s ease-in-out; }
+  @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+
+  .progress-bar { transition: width 0.5s ease-in-out; }
+</style>
 </head>
-<body class="bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen p-6">
+<body class="bg-gradient-to-br from-gray-100 via-white to-purple-50 min-h-screen p-6">
 
 <div class="max-w-4xl mx-auto space-y-6">
 
-  <!-- Timer -->
-  <div id="timerDisplay" class="text-right text-sm font-semibold text-gray-700 bg-white/60 backdrop-blur rounded-full px-4 py-2 w-44 ml-auto shadow-md"></div>
+  <!-- TIMER -->
+  <div id="timerDisplay"
+       class="text-sm font-semibold text-gray-700 bg-white/70 backdrop-blur-md px-4 py-2 rounded-full shadow-md w-fit ml-auto">
+  </div>
 
-  <!-- Questions -->
+  <!-- QUESTIONS -->
   <div id="questionsBox"></div>
 
-  <!-- Next / Submit Button -->
-  <button id="submitBtns" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-6 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition transform">Next</button>
+  <!-- BUTTON -->
+  <div class="text-center">
+    <button id="submitBtns"
+      class="mt-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition transform">
+      Next
+    </button>
+  </div>
 
-  <!-- Result -->
+  <!-- RESULT -->
   <div id="resultBox" class="hidden"></div>
+
 </div>
 
 <script>
+/* ================= SUPABASE ================= */
 const SUPABASE_URL = "https://jzorrdpsvtvoglvxhjfi.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6b3JyZHBzdnR2b2dsdnhoamZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNDA3MzMsImV4cCI6MjA3NjYxNjczM30.HOrkOrtH03AS-q9W-E0w7woDS2ESPDIVBaS64qzDpZw";
+const SUPABASE_ANON_KEY =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6b3JyZHBzdnR2b2dsdnhoamZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNDA3MzMsImV4cCI6MjA3NjYxNjczM30.HOrkOrtH03AS-q9W-E0w7woDS2ESPDIVBaS64qzDpZw";
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+/* ================= VARIABLES ================= */
 const questionsBox = document.getElementById("questionsBox");
 const submitBtns = document.getElementById("submitBtns");
 const resultBox = document.getElementById("resultBox");
+const timerDisplay = document.getElementById("timerDisplay");
 
 let questions = [];
 let currentIndex = 0;
 let userResponses = [];
-let isFinalCommentStep = false;
+let showCommentStep = false;
 
-let totalTime = 600; // 10 minutes
-let timerInterval = null;
+/* ================= TIMER ================= */
+let totalTime = 600; // 10 min
+let timerInterval;
 
-// ====================== TIMER ======================
 function startTimer() {
-  if (timerInterval) clearInterval(timerInterval);
-  const timerDisplay = document.getElementById("timerDisplay");
-
   timerInterval = setInterval(() => {
-    let minutes = Math.floor(totalTime / 60);
-    let seconds = totalTime % 60;
-    minutes = minutes < 10 ? "0" + minutes : minutes;
-    seconds = seconds < 10 ? "0" + seconds : seconds;
-
-    timerDisplay.innerHTML = `⏱ Time Left: ${minutes}:${seconds}`;
+    const min = String(Math.floor(totalTime / 60)).padStart(2, "0");
+    const sec = String(totalTime % 60).padStart(2, "0");
+    timerDisplay.innerHTML = `⏱ Time Left: ${min}:${sec}`;
 
     if (totalTime <= 0) {
       clearInterval(timerInterval);
-      autoSubmitQuiz();
+      autoSubmit();
     }
     totalTime--;
   }, 1000);
 }
 
-// ====================== AUTO SUBMIT ======================
-function autoSubmitQuiz() {
-  Swal.fire({
-    icon: "warning",
-    title: "Time's Up!",
-    text: "Your quiz time is over.",
-    confirmButtonColor: "#6366f1",
-  }).then(() => {
-    submitAllResponses();
-  });
+function autoSubmit() {
+  Swal.fire("Time's Up!", "Your quiz was auto submitted.", "warning")
+    .then(submitAllResponses);
 }
 
-// ====================== LOAD QUESTIONS ======================
-async function loadQuestionsOneByOne() {
-  const { data, error } = await client.from('admin').select('*').order('id', { ascending: true });
-  if (error) return Swal.fire({ icon: "error", text: error.message });
+/* ================= LOAD QUESTIONS ================= */
+async function loadQuestions() {
+  const { data, error } = await client
+    .from("admin")
+    .select("*")
+    .order("id");
 
-  if (!data || data.length === 0) {
-    questionsBox.innerHTML = "<p class='text-center text-gray-500'>No questions available.</p>";
+  if (error || !data.length) {
+    questionsBox.innerHTML = "<p class='text-center text-gray-500'>No questions available</p>";
     submitBtns.classList.add("hidden");
     return;
   }
 
   questions = data;
-  currentIndex = 0;
-  showQuestion(currentIndex);
+  showQuestion();
   startTimer();
 }
 
-// ====================== SHOW SINGLE QUESTION ======================
-function showQuestion(index) {
-  const q = questions[index];
-  if (!q) return;
+/* ================= SHOW QUESTION ================= */
+function showQuestion() {
+  const q = questions[currentIndex];
 
   questionsBox.innerHTML = `
-<div class="bg-white p-6 rounded-2xl shadow-xl space-y-4 border border-gray-300 hover:shadow-2xl transition duration-300">
-  <div class="flex justify-between items-center mb-3">
-    <span class="text-sm font-semibold text-gray-600">Question ${index+1} of ${questions.length}</span>
-    <div class="w-1/2 h-2 bg-gray-200 rounded-full overflow-hidden">
-      <div class="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full transition-all duration-500" style="width: ${(index+1)/questions.length*100}%"></div>
+  <div class="bg-white p-6 rounded-3xl shadow-xl border border-gray-200 fade-in space-y-4 hover:shadow-2xl transition duration-300">
+    <div class="flex justify-between items-center">
+      <span class="text-sm font-semibold text-gray-600">
+        Question ${currentIndex + 1} of ${questions.length}
+      </span>
+      <div class="w-1/2 h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-blue-500 to-purple-600 progress-bar rounded-full"
+             style="width:${((currentIndex + 1)/questions.length)*100}%"></div>
+      </div>
+    </div>
+
+    <p class="text-lg font-semibold text-gray-800 max-h-40 overflow-y-auto pr-2">${q.qText}</p>
+
+    <div class="space-y-2">
+      ${q.qType === "multiple"
+        ? ["A","B","C","D"].map(opt => `
+          <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-blue-50 transition">
+            <input type="radio" name="answer" value="${q[opt]}" class="mr-3 accent-purple-600">
+            <span class="text-gray-700 font-medium">${q[opt]}</span>
+          </label>`).join("")
+        : ["True","False"].map(opt => `
+          <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-blue-50 transition">
+            <input type="radio" name="answer" value="${opt}" class="mr-3 accent-purple-600">
+            <span class="text-gray-700 font-medium">${opt}</span>
+          </label>`).join("")
+      }
     </div>
   </div>
-  <p class="text-gray-800 text-lg font-semibold leading-relaxed max-h-40 overflow-y-auto pr-2">${q.qText}</p>
-  <div id="optionsBox" class="space-y-2">
-    ${q.qType === 'multiple' ? ['A','B','C','D'].map(opt => `
-      <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-blue-50 transition duration-200">
-        <input type="radio" name="q${q.id}" value="${q[opt]}" class="mr-3 h-5 w-5 accent-purple-600">
-        <span class="text-gray-700 font-medium">${q[opt]}</span>
-      </label>
-    `).join('') : q.qType === 'tf' ? ['True','False'].map(opt => `
-      <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-blue-50 transition duration-200">
-        <input type="radio" name="q${q.id}" value="${opt}" class="mr-3 h-5 w-5 accent-purple-600">
-        <span class="text-gray-700 font-medium">${opt}</span>
-      </label>
-    `).join('') : `<p class="text-gray-500 italic text-sm">*This is an informational question.</p>`}
-  </div>
-</div>`;
+  `;
 
-  submitBtns.innerText = currentIndex < questions.length - 1 ? "Next" : "Submit Quiz";
+  submitBtns.innerText =
+    currentIndex === questions.length - 1 ? "Next" : "Next";
 }
 
-// ====================== BUTTON CLICK ======================
-submitBtns.addEventListener("click", async () => {
-  if (!isFinalCommentStep) {
-    const q = questions[currentIndex];
-    const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
-    const answer = selected ? selected.value : null;
-    const is_correct = answer === q.correct;
-
-    userResponses[currentIndex] = {
-      question_id: q.id,
-      answer,
-      is_correct,
-      comment: null
-    };
-
-    if (currentIndex === questions.length - 1) {
-      showCommentBox();
-    } else {
-      currentIndex++;
-      showQuestion(currentIndex);
-    }
-
-  } else {
-    await submitAllResponses();
-  }
-});
-
-// ====================== SHOW COMMENT BOX ======================
+/* ================= COMMENT BOX ================= */
 function showCommentBox() {
-  isFinalCommentStep = true;
+  showCommentStep = true;
 
   questionsBox.innerHTML = `
-    <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-300">
-      <h2 class="text-xl font-bold text-center mb-3">Final Comment (optional)</h2>
+    <div class="bg-white p-6 rounded-3xl shadow-xl border border-gray-200 fade-in">
+      <h2 class="text-xl font-bold mb-3 text-center">Final Comment (Optional)</h2>
       <textarea id="finalComment"
-        class="w-full border rounded p-3 resize-none text-gray-700"
-        rows="4" placeholder="Enter your comment..."></textarea>
+        class="w-full border rounded-lg p-3 resize-none text-gray-700"
+        rows="4"
+        placeholder="Write your feedback here..."></textarea>
     </div>
   `;
 
   submitBtns.innerText = "Submit Quiz";
 }
 
-// ====================== SUBMIT ALL RESPONSES ======================
-async function submitAllResponses() {
-  const { data: userData } = await client.auth.getUser();
-  if (!userData.user) return Swal.fire("Please login first!", "", "error");
+/* ================= BUTTON CLICK ================= */
+submitBtns.addEventListener("click", async () => {
+  if (!showCommentStep) {
+    const selected = document.querySelector("input[name='answer']:checked");
+    const answer = selected ? selected.value : null;
+    const q = questions[currentIndex];
 
-  const email = userData.user.email;
-  const user_id = userData.user.id;
+    userResponses.push({
+      question_id: q.id,
+      answer,
+      is_correct: answer === q.correct,
+      comment: null
+    });
+
+    if (currentIndex === questions.length - 1) {
+      showCommentBox();
+    } else {
+      currentIndex++;
+      showQuestion();
+    }
+  } else {
+    submitAllResponses();
+  }
+});
+
+/* ================= SUBMIT ================= */
+async function submitAllResponses() {
+  clearInterval(timerInterval);
+
+  const { data: user } = await client.auth.getUser();
+  if (!user.user) {
+    Swal.fire("Login required", "", "error");
+    return;
+  }
 
   const finalComment = document.getElementById("finalComment")?.value || null;
   if (finalComment) {
@@ -185,58 +202,55 @@ async function submitAllResponses() {
     });
   }
 
-  const responsesToInsert = userResponses.map(r => ({
-    user_email: email,
-    user_id: user_id,
-    question_id: r.question_id,
-    answer: r.answer,
-    is_correct: r.is_correct,
-    comment: r.comment
+  const payload = userResponses.map(r => ({
+    user_email: user.user.email,
+    user_id: user.user.id,
+    ...r
   }));
 
-  const { error } = await client.from("response").insert(responsesToInsert);
-  if (error) return Swal.fire("Error saving responses", error.message, "error");
+  const { error } = await client.from("response").insert(payload);
+  if (error) return Swal.fire("Error", error.message, "error");
 
-  questionsBox.innerHTML = "";
+  showResult();
+}
+
+/* ================= RESULT ================= */
+function showResult() {
   submitBtns.classList.add("hidden");
-  resultBox.classList.remove("hidden");
+  questionsBox.innerHTML = "";
 
-  const correctCount = userResponses.filter(r => r.is_correct).length;
-  const wrongCount = userResponses.filter(r => r.is_correct === false).length;
+  const correct = userResponses.filter(r => r.is_correct).length;
   const total = questions.length;
-  const percentage = Math.round((correctCount / total) * 100);
-  const passFail = percentage >= 50 ? "PASS" : "FAIL";
-  const passColor = percentage >= 50 ? "text-green-600" : "text-red-600";
+  const percent = Math.round((correct / total) * 100);
 
+  resultBox.classList.remove("hidden");
   resultBox.innerHTML = `
-    <div class="bg-white/90 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-gray-300 max-w-xl mx-auto text-center space-y-4">
-      <h2 class="text-3xl font-extrabold text-gray-800">Quiz Completed!</h2>
-      <div class="flex justify-between text-lg font-medium mt-4">
-        <span>Total Questions:</span>
-        <span class="text-gray-700">${total}</span>
-      </div>
-      <div class="flex justify-between text-lg font-medium text-green-700">
-        <span>Correct Answers:</span>
-        <span>${correctCount}</span>
-      </div>
-      <div class="flex justify-between text-lg font-medium text-red-700">
-        <span>Wrong Answers:</span>
-        <span>${wrongCount}</span>
-      </div>
-      <div class="text-xl font-bold ${passColor}">Result: ${passFail} (${percentage}%)</div>
-      <a href="user.html">
-        <button class="mt-6 bg-gradient-to-r from-purple-500 to-blue-600 text-white py-3 px-6 rounded-full font-semibold shadow-lg 
-             hover:shadow-xl hover:scale-105 transition transform">
-          Retry Quiz
-        </button>
-      </a>
+  <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-xl mx-auto text-center space-y-4 fade-in">
+    <h2 class="text-3xl font-extrabold text-gray-800">Quiz Completed 🎉</h2>
+    <div class="flex justify-between text-lg font-medium mt-4">
+      <span>Total Questions:</span><span>${total}</span>
     </div>
+    <div class="flex justify-between text-lg font-medium text-green-600">
+      <span>Correct:</span><span>${correct}</span>
+    </div>
+    <div class="flex justify-between text-lg font-medium text-red-600">
+      <span>Wrong:</span><span>${total-correct}</span>
+    </div>
+    <h3 class="text-xl font-bold ${percent>=50?'text-green-600':'text-red-600'}">
+      ${percent>=50?'PASS':'FAIL'} (${percent}%)
+    </h3>
+    <a href="user.html">
+      <button class="mt-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-full shadow-lg hover:scale-105 transition transform">
+        Retry Quiz
+      </button>
+    </a>
+  </div>
   `;
 }
 
-// ====================== INITIALIZE ======================
-document.addEventListener("DOMContentLoaded", loadQuestionsOneByOne);
-
+/* ================= START ================= */
+document.addEventListener("DOMContentLoaded", loadQuestions);
 </script>
+
 </body>
 </html>
