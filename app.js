@@ -85,6 +85,71 @@ signupForm?.addEventListener("submit", async (e) => {
     }
   });
 
+  // ====== Add Question Form ======
+
+ document.addEventListener("DOMContentLoaded", () => {
+    const saveBtn = document.getElementById("saveBtn");
+    
+    saveBtn && saveBtn.addEventListener("click", async () => {
+        const type = document.getElementById("qType").value;
+        const failMessage = document.getElementById("failMessage").value;
+
+        let question = { qType: type, failMessage };
+
+        if(type === "multiple") {
+            question.qText = document.getElementById("mq").value;
+            question.A = document.getElementById("ma").value;
+            question.B = document.getElementById("mb").value;
+            question.C = document.getElementById("mc").value;
+            question.D = document.getElementById("md").value;
+            question.correct = document.getElementById("mcorrect").value;
+        } else if(type === "tf") {
+            question.qText = document.getElementById("tfq").value;
+            question.correct = document.getElementById("tfCorrect").value;
+        } else if(type === "data") {
+            question.qText = document.getElementById("dq").value;
+            question.correct = null;
+        } else {
+            Swal.fire({ icon: "error", title: "Error", text: "Select a question type!" });
+            return;
+        }
+
+        if(!question.qText) {
+            Swal.fire({ icon: "error", title: "Error", text: "Enter question text!" });
+            return;
+        }
+
+        const { data, error } = await client.from('admin').insert([question]);
+
+        if(error) {
+            Swal.fire({ icon: "error", title: "Error", text: error.message });
+        } else {
+            Swal.fire({ icon: "success", title: "Saved!", text: "Question added successfully!", timer: 1500, showConfirmButton: false });
+            clearForm();
+        }
+    });
+
+    function clearForm() {
+        document.getElementById("mq").value = "";
+        document.getElementById("ma").value = "";
+        document.getElementById("mb").value = "";
+        document.getElementById("mc").value = "";
+        document.getElementById("md").value = "";
+        document.getElementById("mcorrect").value = "A";
+
+        document.getElementById("tfq").value = "";
+        document.getElementById("tfCorrect").value = "True";
+
+        document.getElementById("dq").value = "";
+        document.getElementById("failMessage").value = "";
+
+        document.getElementById("qType").value = "";
+        document.getElementById("multipleForm").classList.add("hidden");
+        document.getElementById("tfForm").classList.add("hidden");
+        document.getElementById("dataForm").classList.add("hidden");
+    }
+});
+
 let editId=null;
 
 async function loadQuestions(){
@@ -151,10 +216,6 @@ editModal.classList.remove("hidden");
 setTimeout(()=>editBox.classList.add("show"),50);
 }
 
-cancelEdit.onclick=()=>{
-editBox.classList.remove("show");
-setTimeout(()=>editModal.classList.add("hidden"),200);
-};
 
 updateBtn.onclick=async()=>{
 const qText=editQText.value;
