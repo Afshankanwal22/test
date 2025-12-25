@@ -150,107 +150,100 @@ signupForm?.addEventListener("submit", async (e) => {
     }
 });
 
-let editId=null;
 
-async function loadQuestions(){
-const {data,error}=await client.from("admin").select("*").order("id");
-const table=document.getElementById("questionsTable");
-table.innerHTML="";
+let editId = null;
 
-if(error){
-Swal.fire("Error",error.message,"error");
-return;
+// DOM Elements
+const editModal = document.getElementById("editModal");
+const editBox = document.getElementById("editBox");
+const editQText = document.getElementById("editQText");
+const editCorrect = document.getElementById("editCorrect");
+const updateBtn = document.getElementById("updateBtn");
+const cancelEdit = document.getElementById("cancelEdit");
+const deleteBtn = document.getElementById("deleteBtn");
+
+// Load Questions from Supabase
+async function loadQuestions() {
+  const { data, error } = await client.from("admin").select("*").order("id");
+  const table = document.getElementById("questionsTable");
+  table.innerHTML = "";
+
+  if (error) return Swal.fire("Error", error.message, "error");
+  if (!data.length) return table.innerHTML = `<tr><td colspan="5" class="text-center py-4">No Data</td></tr>`;
+
+  data.forEach((q, i) => {
+    const row = document.createElement("tr");
+    row.className = "border-b hover:bg-blue-50";
+
+    row.innerHTML = `
+      <td class="p-3">${i+1}</td>
+      <td class="p-3">${q.qText}</td>
+      <td class="p-3">${q.qType}</td>
+      <td class="p-3 font-semibold text-blue-700">${q.correct || "-"}</td>
+      <td class="p-3 text-center">
+        <button class="editBtn bg-yellow-400 text-white px-3 py-1 rounded" 
+          data-id="${q.id}" data-text="${q.qText}" data-correct="${q.correct || ""}">
+          Edit
+        </button>
+      </td>
+    `;
+    table.appendChild(row);
+  });
+
+  // Add click listener for edit buttons
+  document.querySelectorAll(".editBtn").forEach(btn => {
+    btn.addEventListener("click", () => openEdit(btn.dataset.id, btn.dataset.text, btn.dataset.correct));
+  });
 }
 
-if(!data.length){
-table.innerHTML=`<tr><td colspan="5" class="text-center py-4">No Data</td></tr>`;
-return;
+// Open Modal
+function openEdit(id, text, correct) {
+  editId = id;
+  editQText.value = text;
+  editCorrect.value = correct;
+
+  editModal.classList.remove("hidden");
+  setTimeout(() => editBox.classList.add("show"), 50);
 }
 
-data.forEach((q,i)=>{
-const row=document.createElement("tr");
-row.className="border-b hover:bg-blue-50";
-
-row.innerHTML=`
-<td class="p-3">${i+1}</td>
-<td class="p-3">${q.qText}</td>
-<td class="p-3">${q.qType}</td>
-<td class="p-3 font-semibold text-blue-700">${q.correct||"-"}</td>
-<td class="p-3 text-center space-x-2">
-<button class="editBtn bg-yellow-400 text-white px-3 py-1 rounded"
-data-id="${q.id}"
-data-text="${q.qText}"
-data-correct="${q.correct||""}">
-Edit
-</button>
-
-<button class="deleteBtn bg-red-500 text-white px-3 py-1 rounded"
-data-id="${q.id}">
-Delete
-</button>
-</td>
-`;
-table.appendChild(row);
-});
-
-/* SAME FUNCTIONALITY AS YOUR CODE */
-document.querySelectorAll(".editBtn").forEach(btn=>{
-btn.addEventListener("click",()=>{
-openEdit(btn.dataset.id,btn.dataset.text,btn.dataset.correct);
-});
-});
-
-document.querySelectorAll(".deleteBtn").forEach(btn=>{
-btn.addEventListener("click",()=>{
-deleteQuestion(btn.dataset.id);
-});
-});
-}
-
-function openEdit(id,text,correct){
-editId=id;
-editQText.value=text;
-editCorrect.value=correct;
-
-editModal.classList.remove("hidden");
-setTimeout(()=>editBox.classList.add("show"),50);
-}
-
-
-updateBtn.onclick=async()=>{
-const qText=editQText.value;
-const correct=editCorrect.value;
-
-if(!qText){
-Swal.fire("Error","Question empty","error");
-return;
-}
-
-const {error}=await client.from("admin")
-.update({qText,correct})
-.eq("id",editId);
-
-if(error){
-Swal.fire("Error",error.message,"error");
-return;
-}
-
-Swal.fire("Updated","Saved successfully","success");
-cancelEdit.click();
-loadQuestions();
+// Close Modal
+cancelEdit.onclick = () => {
+  editBox.classList.remove("show");
+  setTimeout(() => editModal.classList.add("hidden"), 200);
 };
 
-async function deleteQuestion(id){
-const res=await Swal.fire({
-title:"Delete?",
-icon:"warning",
-showCancelButton:true
-});
-if(res.isConfirmed){
-await client.from("admin").delete().eq("id",id);
-Swal.fire("Deleted","Removed","success");
-loadQuestions();
-}
-}
+// Update Question
+updateBtn.onclick = async () => {
+  const qText = editQText.value.trim();
+  const correct = editCorrect.value.trim();
 
-document.addEventListener("DOMContentLoaded",loadQuestions);
+  if (!qText) return Swal.fire("Error", "Question cannot be empty", "error");
+
+  const { error } = await client.from("admin").update({ qText, correct }).eq("id", editId);
+  if (error) return Swal.fire("Error", error.message, "error");
+
+  Swal.fire("Updated", "Question updated successfully", "success");
+  cancelEdit.click();
+  loadQuestions();
+};
+
+// Delete Question
+deleteBtn.onclick = async () => {
+  if (!editId) return;
+
+  const res = await Swal.fire({
+    title: "Delete this question?",
+    icon: "warning",
+    showCancelButton: true
+  });
+
+  if (res.isConfirmed) {
+    await client.from("admin").delete().eq("id", editId);
+    Swal.fire("Deleted", "Question removed", "success");
+    cancelEdit.click();
+    loadQuestions();
+  }
+};
+
+// Initial Load
+document.addEventListener("DOMContentLoaded", loadQuestions);
