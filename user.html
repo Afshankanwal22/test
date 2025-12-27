@@ -11,20 +11,19 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
 <style>
-  /* Custom animations for smooth transitions */
-  .fade-in { animation: fadeIn 0.4s ease-in-out; }
-  @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
-
-  .progress-bar { transition: width 0.5s ease-in-out; }
+.fade-in { animation: fadeIn 0.4s ease-in-out; }
+@keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+.progress-bar { transition: width 0.5s ease-in-out; }
 </style>
 </head>
+
 <body class="bg-gradient-to-br from-gray-100 via-white to-purple-50 min-h-screen p-6">
 
 <div class="max-w-4xl mx-auto space-y-6">
 
   <!-- TIMER -->
   <div id="timerDisplay"
-       class="text-sm font-semibold text-gray-700 bg-white/70 backdrop-blur-md px-4 py-2 rounded-full shadow-md w-fit ml-auto">
+    class="text-sm font-semibold text-gray-700 bg-white/70 backdrop-blur-md px-4 py-2 rounded-full shadow-md w-fit ml-auto">
   </div>
 
   <!-- QUESTIONS -->
@@ -33,7 +32,7 @@
   <!-- BUTTON -->
   <div class="text-center">
     <button id="submitBtns"
-      class="mt-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition transform">
+      class="mt-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:scale-105 transition">
       Next
     </button>
   </div>
@@ -46,7 +45,7 @@
 <script>
 /* ================= SUPABASE ================= */
 const SUPABASE_URL = "https://jzorrdpsvtvoglvxhjfi.supabase.co";
-const SUPABASE_ANON_KEY =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6b3JyZHBzdnR2b2dsdnhoamZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNDA3MzMsImV4cCI6MjA3NjYxNjczM30.HOrkOrtH03AS-q9W-E0w7woDS2ESPDIVBaS64qzDpZw";
+const SUPABASE_ANON_KEY = "YOUR_ANON_KEY_HERE";
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* ================= VARIABLES ================= */
@@ -61,14 +60,14 @@ let userResponses = [];
 let showCommentStep = false;
 
 /* ================= TIMER ================= */
-let totalTime = 600; // 10 min
+let totalTime = 600;
 let timerInterval;
 
 function startTimer() {
   timerInterval = setInterval(() => {
     const min = String(Math.floor(totalTime / 60)).padStart(2, "0");
     const sec = String(totalTime % 60).padStart(2, "0");
-    timerDisplay.innerHTML = `⏱ Time Left: ${min}:${sec}`;
+    timerDisplay.innerHTML = `⏱ ${min}:${sec}`;
 
     if (totalTime <= 0) {
       clearInterval(timerInterval);
@@ -79,19 +78,16 @@ function startTimer() {
 }
 
 function autoSubmit() {
-  Swal.fire("Time's Up!", "Your quiz was auto submitted.", "warning")
+  Swal.fire("Time's Up!", "Quiz auto submitted", "warning")
     .then(submitAllResponses);
 }
 
 /* ================= LOAD QUESTIONS ================= */
 async function loadQuestions() {
-  const { data, error } = await client
-    .from("admin")
-    .select("*")
-    .order("id");
+  const { data, error } = await client.from("admin").select("*").order("id");
 
   if (error || !data.length) {
-    questionsBox.innerHTML = "<p class='text-center text-gray-500'>No questions available</p>";
+    questionsBox.innerHTML = "<p class='text-center'>No questions available</p>";
     submitBtns.classList.add("hidden");
     return;
   }
@@ -106,59 +102,49 @@ function showQuestion() {
   const q = questions[currentIndex];
 
   questionsBox.innerHTML = `
-  <div class="bg-white p-6 rounded-3xl shadow-xl border border-gray-200 fade-in space-y-4 hover:shadow-2xl transition duration-300">
+  <div class="bg-white p-6 rounded-3xl shadow-xl fade-in space-y-4">
     <div class="flex justify-between items-center">
       <span class="text-sm font-semibold text-gray-600">
         Question ${currentIndex + 1} of ${questions.length}
       </span>
-      <div class="w-1/2 h-2 bg-gray-200 rounded-full overflow-hidden">
-        <div class="h-full bg-gradient-to-r from-blue-500 to-purple-600 progress-bar rounded-full"
-             style="width:${((currentIndex + 1)/questions.length)*100}%"></div>
+      <div class="w-1/2 h-2 bg-gray-200 rounded-full">
+        <div class="h-full bg-purple-600 progress-bar rounded-full"
+          style="width:${((currentIndex + 1)/questions.length)*100}%"></div>
       </div>
     </div>
 
-    <p class="text-lg font-semibold text-gray-800 max-h-40 overflow-y-auto pr-2">${q.qText}</p>
+    <p class="text-lg font-semibold">${q.qText}</p>
 
     <div class="space-y-2">
-      ${q.qType === "multiple"
-        ? ["A","B","C","D"].map(opt => `
-          <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-blue-50 transition">
-            <input type="radio" name="answer" value="${q[opt]}" class="mr-3 accent-purple-600">
-            <span class="text-gray-700 font-medium">${q[opt]}</span>
-          </label>`).join("")
-        : ["True","False"].map(opt => `
-          <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-blue-50 transition">
-            <input type="radio" name="answer" value="${opt}" class="mr-3 accent-purple-600">
-            <span class="text-gray-700 font-medium">${opt}</span>
-          </label>`).join("")
-      }
+      ${(q.qType === "multiple"
+        ? ["A","B","C","D"]
+        : ["True","False"]
+      ).map(opt => `
+        <label class="flex items-center p-3 border rounded-xl cursor-pointer">
+          <input type="radio" name="answer"
+            value="${q[opt] || opt}" class="mr-3">
+          <span>${q[opt] || opt}</span>
+        </label>
+      `).join("")}
     </div>
-  </div>
-  `;
-
-  submitBtns.innerText =
-    currentIndex === questions.length - 1 ? "Next" : "Next";
+  </div>`;
 }
 
-/* ================= COMMENT BOX ================= */
+/* ================= COMMENT ================= */
 function showCommentBox() {
   showCommentStep = true;
-
   questionsBox.innerHTML = `
-    <div class="bg-white p-6 rounded-3xl shadow-xl border border-gray-200 fade-in">
-      <h2 class="text-xl font-bold mb-3 text-center">Final Comment (Optional)</h2>
-      <textarea id="finalComment"
-        class="w-full border rounded-lg p-3 resize-none text-gray-700"
-        rows="4"
-        placeholder="Write your feedback here..."></textarea>
-    </div>
-  `;
-
+  <div class="bg-white p-6 rounded-3xl shadow-xl fade-in">
+    <h2 class="text-xl font-bold mb-3 text-center">Final Comment</h2>
+    <textarea id="finalComment"
+      class="w-full border rounded-lg p-3"
+      rows="4" placeholder="Optional feedback"></textarea>
+  </div>`;
   submitBtns.innerText = "Submit Quiz";
 }
 
-/* ================= BUTTON CLICK ================= */
-submitBtns.addEventListener("click", async () => {
+/* ================= NEXT / SUBMIT ================= */
+submitBtns.addEventListener("click", () => {
   if (!showCommentStep) {
     const selected = document.querySelector("input[name='answer']:checked");
     const answer = selected ? selected.value : null;
@@ -187,12 +173,9 @@ async function submitAllResponses() {
   clearInterval(timerInterval);
 
   const { data: user } = await client.auth.getUser();
-  if (!user.user) {
-    Swal.fire("Login required", "", "error");
-    return;
-  }
+  if (!user.user) return Swal.fire("Login required", "", "error");
 
-  const finalComment = document.getElementById("finalComment")?.value || null;
+  const finalComment = document.getElementById("finalComment")?.value;
   if (finalComment) {
     userResponses.push({
       question_id: null,
@@ -202,19 +185,18 @@ async function submitAllResponses() {
     });
   }
 
-  const payload = userResponses.map(r => ({
-    user_email: user.user.email,
-    user_id: user.user.id,
-    ...r
-  }));
-
-  const { error } = await client.from("response").insert(payload);
-  if (error) return Swal.fire("Error", error.message, "error");
+  await client.from("response").insert(
+    userResponses.map(r => ({
+      user_email: user.user.email,
+      user_id: user.user.id,
+      ...r
+    }))
+  );
 
   showResult();
 }
 
-/* ================= RESULT ================= */
+/* ================= RESULT + LOGOUT ================= */
 function showResult() {
   submitBtns.classList.add("hidden");
   questionsBox.innerHTML = "";
@@ -225,27 +207,25 @@ function showResult() {
 
   resultBox.classList.remove("hidden");
   resultBox.innerHTML = `
-  <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-xl mx-auto text-center space-y-4 fade-in">
-    <h2 class="text-3xl font-extrabold text-gray-800">Quiz Completed 🎉</h2>
-    <div class="flex justify-between text-lg font-medium mt-4">
-      <span>Total Questions:</span><span>${total}</span>
-    </div>
-    <div class="flex justify-between text-lg font-medium text-green-600">
-      <span>Correct:</span><span>${correct}</span>
-    </div>
-    <div class="flex justify-between text-lg font-medium text-red-600">
-      <span>Wrong:</span><span>${total-correct}</span>
-    </div>
-    <h3 class="text-xl font-bold ${percent>=50?'text-green-600':'text-red-600'}">
-      ${percent>=50?'PASS':'FAIL'} (${percent}%)
-    </h3>
-    <a href="user.html">
-      <button class="mt-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-full shadow-lg hover:scale-105 transition transform">
-        Retry Quiz
-      </button>
-    </a>
+  <div class="flex justify-end mb-4">
+    <button id="logoutBtn"
+      class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full">
+      Logout
+    </button>
   </div>
-  `;
+
+  <div class="bg-white p-8 rounded-3xl shadow-xl text-center space-y-3 fade-in">
+    <h2 class="text-3xl font-bold">Quiz Completed 🎉</h2>
+    <p>Total: ${total}</p>
+    <p class="text-green-600">Correct: ${correct}</p>
+    <p class="text-red-600">Wrong: ${total - correct}</p>
+    <h3 class="font-bold">${percent >= 50 ? "PASS" : "FAIL"} (${percent}%)</h3>
+  </div>`;
+
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    await client.auth.signOut();
+    window.location.href = "index.html";
+  });
 }
 
 /* ================= START ================= */

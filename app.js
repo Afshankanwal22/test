@@ -176,17 +176,22 @@ async function loadQuestions() {
     row.className = "border-b hover:bg-blue-50";
 
     row.innerHTML = `
-      <td class="p-3">${i+1}</td>
-      <td class="p-3">${q.qText}</td>
-      <td class="p-3">${q.qType}</td>
-      <td class="p-3 font-semibold text-blue-700">${q.correct || "-"}</td>
-      <td class="p-3 text-center">
-        <button class="editBtn bg-yellow-400 text-white px-3 py-1 rounded" 
-          data-id="${q.id}" data-text="${q.qText}" data-correct="${q.correct || ""}">
-          Edit
-        </button>
-      </td>
-    `;
+<td class="p-3 text-center">${i + 1}</td>
+<td class="p-3">${q.qText}</td>
+<td class="p-3 text-center">${q.qType}</td>
+<td class="p-3 text-center font-semibold text-blue-700">
+  ${q.correct || "-"}
+</td>
+<td class="p-3 text-center">
+  <button class="editBtn bg-yellow-400 text-white px-3 py-1 rounded"
+    data-id="${q.id}"
+    data-text="${q.qText}"
+    data-correct="${q.correct || ""}">
+    Edit
+  </button>
+</td>
+`;
+
     table.appendChild(row);
   });
 
