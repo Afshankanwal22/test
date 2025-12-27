@@ -23,13 +23,13 @@
 
   <!-- TIMER -->
   <div id="timerDisplay"
-    class="text-sm font-semibold text-gray-700 bg-white/70 backdrop-blur-md px-4 py-2 rounded-full shadow-md w-fit ml-auto">
+    class="text-sm font-semibold text-gray-700 bg-white/70 px-4 py-2 rounded-full shadow-md w-fit ml-auto">
   </div>
 
   <!-- QUESTIONS -->
   <div id="questionsBox"></div>
 
-  <!-- BUTTON -->
+  <!-- NEXT BUTTON -->
   <div class="text-center">
     <button id="submitBtns"
       class="mt-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:scale-105 transition">
@@ -45,7 +45,9 @@
 <script>
 /* ================= SUPABASE ================= */
 const SUPABASE_URL = "https://jzorrdpsvtvoglvxhjfi.supabase.co";
-const SUPABASE_ANON_KEY = "YOUR_ANON_KEY_HERE";
+const SUPABASE_ANON_KEY =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6b3JyZHBzdnR2b2dsdnhoamZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNDA3MzMsImV4cCI6MjA3NjYxNjczM30.HOrkOrtH03AS-q9W-E0w7woDS2ESPDIVBaS64qzDpZw";
+
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* ================= VARIABLES ================= */
@@ -67,19 +69,14 @@ function startTimer() {
   timerInterval = setInterval(() => {
     const min = String(Math.floor(totalTime / 60)).padStart(2, "0");
     const sec = String(totalTime % 60).padStart(2, "0");
-    timerDisplay.innerHTML = `⏱ ${min}:${sec}`;
+    timerDisplay.innerHTML = `⏱ Time Left: ${min}:${sec}`;
 
     if (totalTime <= 0) {
       clearInterval(timerInterval);
-      autoSubmit();
+      submitAllResponses();
     }
     totalTime--;
   }, 1000);
-}
-
-function autoSubmit() {
-  Swal.fire("Time's Up!", "Quiz auto submitted", "warning")
-    .then(submitAllResponses);
 }
 
 /* ================= LOAD QUESTIONS ================= */
@@ -87,7 +84,7 @@ async function loadQuestions() {
   const { data, error } = await client.from("admin").select("*").order("id");
 
   if (error || !data.length) {
-    questionsBox.innerHTML = "<p class='text-center'>No questions available</p>";
+    questionsBox.innerHTML = "<p class='text-center'>No questions</p>";
     submitBtns.classList.add("hidden");
     return;
   }
@@ -104,28 +101,29 @@ function showQuestion() {
   questionsBox.innerHTML = `
   <div class="bg-white p-6 rounded-3xl shadow-xl fade-in space-y-4">
     <div class="flex justify-between items-center">
-      <span class="text-sm font-semibold text-gray-600">
-        Question ${currentIndex + 1} of ${questions.length}
-      </span>
+      <span>Question ${currentIndex + 1} of ${questions.length}</span>
       <div class="w-1/2 h-2 bg-gray-200 rounded-full">
-        <div class="h-full bg-purple-600 progress-bar rounded-full"
-          style="width:${((currentIndex + 1)/questions.length)*100}%"></div>
+        <div class="h-full bg-purple-600 rounded-full progress-bar"
+          style="width:${((currentIndex+1)/questions.length)*100}%"></div>
       </div>
     </div>
 
     <p class="text-lg font-semibold">${q.qText}</p>
 
     <div class="space-y-2">
-      ${(q.qType === "multiple"
-        ? ["A","B","C","D"]
-        : ["True","False"]
-      ).map(opt => `
-        <label class="flex items-center p-3 border rounded-xl cursor-pointer">
-          <input type="radio" name="answer"
-            value="${q[opt] || opt}" class="mr-3">
-          <span>${q[opt] || opt}</span>
-        </label>
-      `).join("")}
+      ${
+        q.qType === "multiple"
+        ? ["A","B","C","D"].map(opt => `
+          <label class="flex items-center gap-2 p-2 border rounded cursor-pointer">
+            <input type="radio" name="answer" value="${q[opt]}">
+            ${q[opt]}
+          </label>`).join("")
+        : ["True","False"].map(opt => `
+          <label class="flex items-center gap-2 p-2 border rounded cursor-pointer">
+            <input type="radio" name="answer" value="${opt}">
+            ${opt}
+          </label>`).join("")
+      }
     </div>
   </div>`;
 }
@@ -134,16 +132,14 @@ function showQuestion() {
 function showCommentBox() {
   showCommentStep = true;
   questionsBox.innerHTML = `
-  <div class="bg-white p-6 rounded-3xl shadow-xl fade-in">
-    <h2 class="text-xl font-bold mb-3 text-center">Final Comment</h2>
-    <textarea id="finalComment"
-      class="w-full border rounded-lg p-3"
-      rows="4" placeholder="Optional feedback"></textarea>
-  </div>`;
+    <div class="bg-white p-6 rounded-xl shadow">
+      <h2 class="text-xl font-bold text-center mb-3">Final Comment</h2>
+      <textarea id="finalComment" class="w-full border p-3 rounded"></textarea>
+    </div>`;
   submitBtns.innerText = "Submit Quiz";
 }
 
-/* ================= NEXT / SUBMIT ================= */
+/* ================= BUTTON ================= */
 submitBtns.addEventListener("click", () => {
   if (!showCommentStep) {
     const selected = document.querySelector("input[name='answer']:checked");
@@ -153,46 +149,17 @@ submitBtns.addEventListener("click", () => {
     userResponses.push({
       question_id: q.id,
       answer,
-      is_correct: answer === q.correct,
-      comment: null
+      is_correct: answer === q.correct
     });
 
-    if (currentIndex === questions.length - 1) {
-      showCommentBox();
-    } else {
-      currentIndex++;
-      showQuestion();
-    }
-  } else {
-    submitAllResponses();
-  }
+    if (currentIndex === questions.length - 1) showCommentBox();
+    else { currentIndex++; showQuestion(); }
+  } else submitAllResponses();
 });
 
 /* ================= SUBMIT ================= */
 async function submitAllResponses() {
   clearInterval(timerInterval);
-
-  const { data: user } = await client.auth.getUser();
-  if (!user.user) return Swal.fire("Login required", "", "error");
-
-  const finalComment = document.getElementById("finalComment")?.value;
-  if (finalComment) {
-    userResponses.push({
-      question_id: null,
-      answer: null,
-      is_correct: null,
-      comment: finalComment
-    });
-  }
-
-  await client.from("response").insert(
-    userResponses.map(r => ({
-      user_email: user.user.email,
-      user_id: user.user.id,
-      ...r
-    }))
-  );
-
   showResult();
 }
 
@@ -207,25 +174,29 @@ function showResult() {
 
   resultBox.classList.remove("hidden");
   resultBox.innerHTML = `
-  <div class="flex justify-end mb-4">
-    <button id="logoutBtn"
-      class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full">
+  <div class="relative bg-white p-8 rounded-3xl shadow-xl text-center fade-in">
+
+    <!-- LOGOUT -->
+    <button onclick="logout()"
+      class="absolute top-4 right-4 bg-red-500 text-white px-4 py-1 rounded-full text-sm">
       Logout
     </button>
-  </div>
 
-  <div class="bg-white p-8 rounded-3xl shadow-xl text-center space-y-3 fade-in">
-    <h2 class="text-3xl font-bold">Quiz Completed 🎉</h2>
+    <h2 class="text-3xl font-bold mb-4">Quiz Result</h2>
     <p>Total: ${total}</p>
     <p class="text-green-600">Correct: ${correct}</p>
     <p class="text-red-600">Wrong: ${total - correct}</p>
-    <h3 class="font-bold">${percent >= 50 ? "PASS" : "FAIL"} (${percent}%)</h3>
-  </div>`;
 
-  document.getElementById("logoutBtn").addEventListener("click", async () => {
-    await client.auth.signOut();
-    window.location.href = "index.html";
-  });
+    <h3 class="text-xl font-bold mt-3 ${percent>=50?'text-green-600':'text-red-600'}">
+      ${percent>=50?'PASS':'FAIL'} (${percent}%)
+    </h3>
+  </div>`;
+}
+
+/* ================= LOGOUT ================= */
+async function logout(){
+  await client.auth.signOut();
+  window.location.href = "index.html";
 }
 
 /* ================= START ================= */
